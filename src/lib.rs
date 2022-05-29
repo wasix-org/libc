@@ -157,12 +157,11 @@ cfg_if! {
 
         mod wasi;
         pub use wasi::*;
-    } else if #[cfg(target_os = "xous")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
 
-        mod xous;
-        pub use xous::*;
+        // for backwards compatibility
+        pub mod unix {
+            pub use super::wasi::*;
+        }
     } else {
         // non-supported targets: empty...
     }
