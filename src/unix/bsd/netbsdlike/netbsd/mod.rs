@@ -2472,7 +2472,7 @@ f! {
     pub fn minor(dev: ::dev_t) -> ::c_int {
         let mut res = 0;
         res |= ((dev as u32) & 0xfff00000) >> 12;
-        res |= ((dev as u32) & 0x000000ff);
+        res |= (dev as u32) & 0x000000ff;
         res as ::c_int
     }
 }
