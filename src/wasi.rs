@@ -54,6 +54,9 @@ pub type sa_family_t = u16;
 pub type sa_type_t = u16;
 
 #[cfg(target_vendor = "wasmer")]
+pub type sighandler_t = ::size_t;
+
+#[cfg(target_vendor = "wasmer")]
 pub type pthread_t = c_ulong;
 #[cfg(target_vendor = "wasmer")]
 pub type pthread_key_t = ::c_uint;
@@ -806,9 +809,30 @@ pub const INT_MAX: c_int = 2147483647;
 
 pub const EXIT_SUCCESS: c_int = 0;
 pub const EXIT_FAILURE: c_int = 1;
+
 pub const STDIN_FILENO: c_int = 0;
 pub const STDOUT_FILENO: c_int = 1;
 pub const STDERR_FILENO: c_int = 2;
+
+pub const SIGHUP: ::c_int = 1;
+pub const SIGINT: ::c_int = 2;
+pub const SIGQUIT: ::c_int = 3;
+pub const SIGILL: ::c_int = 4;
+pub const SIGABRT: ::c_int = 6;
+pub const SIGFPE: ::c_int = 8;
+pub const SIGKILL: ::c_int = 9;
+pub const SIGSEGV: ::c_int = 11;
+pub const SIGPIPE: ::c_int = 13;
+pub const SIGALRM: ::c_int = 14;
+pub const SIGTERM: ::c_int = 15;
+
+#[cfg(target_vendor = "wasmer")]
+pub const SIG_DFL: sighandler_t = 0 as sighandler_t;
+#[cfg(target_vendor = "wasmer")]
+pub const SIG_IGN: sighandler_t = 1 as sighandler_t;
+#[cfg(target_vendor = "wasmer")]
+pub const SIG_ERR: sighandler_t = !0 as sighandler_t;
+
 pub const SEEK_SET: c_int = 0;
 pub const SEEK_CUR: c_int = 1;
 pub const SEEK_END: c_int = 2;
@@ -1069,6 +1093,13 @@ pub const INADDR_MAX_LOCAL_GROUP: in_addr_t = 0xe00000ff;
 pub const ARPOP_REQUEST: u16 = 1;
 pub const ARPOP_REPLY: u16 = 2;
 
+pub const POSIX_SPAWN_RESETIDS: ::c_int = 0x01;
+pub const POSIX_SPAWN_SETPGROUP: ::c_int = 0x02;
+pub const POSIX_SPAWN_SETSIGDEF: ::c_int = 0x04;
+pub const POSIX_SPAWN_SETSIGMASK: ::c_int = 0x08;
+pub const POSIX_SPAWN_SETSCHEDPARAM: ::c_int = 0x10;
+pub const POSIX_SPAWN_SETSCHEDULER: ::c_int = 0x20;
+
 #[cfg_attr(
     feature = "rustc-dep-of-std",
     link(
@@ -1278,6 +1309,30 @@ extern "C" {
 
     pub fn access(path: *const c_char, amode: ::c_int) -> ::c_int;
     pub fn close(fd: ::c_int) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
+    pub fn dup(fd: ::c_int) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn dup2(src: ::c_int, dst: ::c_int) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execl(path: *const c_char, arg0: *const c_char, ...) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execle(path: *const ::c_char, arg0: *const ::c_char, ...) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execlp(file: *const ::c_char, arg0: *const ::c_char, ...) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execv(prog: *const c_char, argv: *const *const c_char) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execve(
+        prog: *const c_char,
+        argv: *const *const c_char,
+        envp: *const *const c_char,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn execvp(c: *const c_char, argv: *const *const c_char) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn fork() -> pid_t;
+
     pub fn fpathconf(filedes: ::c_int, name: ::c_int) -> c_long;
     pub fn getopt(argc: ::c_int, argv: *const *mut c_char, optstr: *const c_char) -> ::c_int;
     pub fn isatty(fd: ::c_int) -> ::c_int;
@@ -1490,6 +1545,111 @@ extern "C" {
     pub fn arc4random_buf(a: *mut c_void, b: size_t);
     pub fn arc4random_uniform(a: u32) -> u32;
 
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn(
+        pid: *mut ::pid_t,
+        path: *const ::c_char,
+        file_actions: *const ::posix_spawn_file_actions_t,
+        attrp: *const ::posix_spawnattr_t,
+        argv: *const *mut ::c_char,
+        envp: *const *mut ::c_char,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnp(
+        pid: *mut ::pid_t,
+        file: *const ::c_char,
+        file_actions: *const ::posix_spawn_file_actions_t,
+        attrp: *const ::posix_spawnattr_t,
+        argv: *const *mut ::c_char,
+        envp: *const *mut ::c_char,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_init(attr: *mut posix_spawnattr_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_destroy(attr: *mut posix_spawnattr_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getsigdefault(
+        attr: *const posix_spawnattr_t,
+        default: *mut ::sigset_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setsigdefault(
+        attr: *mut posix_spawnattr_t,
+        default: *const ::sigset_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getsigmask(
+        attr: *const posix_spawnattr_t,
+        default: *mut ::sigset_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setsigmask(
+        attr: *mut posix_spawnattr_t,
+        default: *const ::sigset_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getflags(
+        attr: *const posix_spawnattr_t,
+        flags: *mut ::c_short,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setflags(attr: *mut posix_spawnattr_t, flags: ::c_short) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getpgroup(
+        attr: *const posix_spawnattr_t,
+        flags: *mut ::pid_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setpgroup(attr: *mut posix_spawnattr_t, flags: ::pid_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getschedpolicy(
+        attr: *const posix_spawnattr_t,
+        flags: *mut ::c_int,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setschedpolicy(attr: *mut posix_spawnattr_t, flags: ::c_int) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_getschedparam(
+        attr: *const posix_spawnattr_t,
+        param: *mut ::sched_param,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawnattr_setschedparam(
+        attr: *mut posix_spawnattr_t,
+        param: *const ::sched_param,
+    ) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn_file_actions_init(actions: *mut posix_spawn_file_actions_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn_file_actions_destroy(actions: *mut posix_spawn_file_actions_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn_file_actions_addopen(
+        actions: *mut posix_spawn_file_actions_t,
+        fd: ::c_int,
+        path: *const ::c_char,
+        oflag: ::c_int,
+        mode: ::mode_t,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn_file_actions_addclose(
+        actions: *mut posix_spawn_file_actions_t,
+        fd: ::c_int,
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn posix_spawn_file_actions_adddup2(
+        actions: *mut posix_spawn_file_actions_t,
+        fd: ::c_int,
+        newfd: ::c_int,
+    ) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
+    pub fn wait(status: *mut ::c_int) -> pid_t;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn waitpid(pid: pid_t, status: *mut ::c_int, options: ::c_int) -> pid_t;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn kill(pid: pid_t, sig: ::c_int) -> ::c_int;
+    
     #[cfg(target_vendor = "wasmer")]
     pub fn sigemptyset(set: *mut sigset_t) -> ::c_int;
     #[cfg(target_vendor = "wasmer")]
