@@ -794,6 +794,30 @@ s! {
     pub struct fd_set {
         __nfds: usize,
         __fds: [c_int; FD_SETSIZE as usize],
+
+    pub struct sched_param {
+        pub sched_priority: ::c_int,
+        pub sched_ss_low_priority: ::c_int,
+        pub sched_ss_repl_period: ::timespec,
+        pub sched_ss_init_budget: ::timespec,
+        pub sched_ss_max_repl: ::c_int,
+    }
+
+    pub struct posix_spawn_file_actions_t {
+        __allocated: ::c_int,
+        __used: ::c_int,
+        __actions: *mut ::c_int,
+        __pad: [::c_int; 16],
+    }
+
+    pub struct posix_spawnattr_t {
+        __flags: ::c_short,
+        __pgrp: ::pid_t,
+        __sd: ::sigset_t,
+        __ss: ::sigset_t,
+        __prio: ::c_int,
+        __policy: ::c_int,
+        __pad: [::c_int; 16],
     }
 }
 
