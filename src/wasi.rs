@@ -1491,6 +1491,22 @@ extern "C" {
     pub fn arc4random_uniform(a: u32) -> u32;
 
     #[cfg(target_vendor = "wasmer")]
+    pub fn sigemptyset(set: *mut sigset_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigaddset(set: *mut sigset_t, signum: ::c_int) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigfillset(set: *mut sigset_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigdelset(set: *mut sigset_t, signum: ::c_int) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigismember(set: *const sigset_t, signum: ::c_int) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigprocmask(how: ::c_int, set: *const sigset_t, oldset: *mut sigset_t) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn sigpending(set: *mut sigset_t) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
     pub fn pthread_self() -> ::pthread_t;
     #[cfg(target_vendor = "wasmer")]
     pub fn pthread_join(native: ::pthread_t, value: *mut *mut ::c_void) -> ::c_int;
@@ -1538,4 +1554,48 @@ pub fn mlockall(flags: ::c_int) -> ::c_int {
 }
 pub fn munlockall() -> ::c_int {
     0
+}
+
+pub fn WIFSTOPPED(status: ::c_int) -> bool {
+    (status & 0xff) == 0x7f
+}
+
+pub fn WSTOPSIG(status: ::c_int) -> ::c_int {
+    (status >> 8) & 0xff
+}
+
+pub fn WIFCONTINUED(status: ::c_int) -> bool {
+    status == 0xffff
+}
+
+pub fn WIFSIGNALED(status: ::c_int) -> bool {
+    ((status & 0x7f) + 1) as i8 >= 2
+}
+
+pub fn WTERMSIG(status: ::c_int) -> ::c_int {
+    status & 0x7f
+}
+
+pub fn WIFEXITED(status: ::c_int) -> bool {
+    (status & 0x7f) == 0
+}
+
+pub fn WEXITSTATUS(status: ::c_int) -> ::c_int {
+    (status >> 8) & 0xff
+}
+
+pub fn WCOREDUMP(status: ::c_int) -> bool {
+    (status & 0x80) != 0
+}
+
+pub fn W_EXITCODE(ret: ::c_int, sig: ::c_int) -> ::c_int {
+    (ret << 8) | sig
+}
+
+pub fn W_STOPCODE(sig: ::c_int) -> ::c_int {
+    (sig << 8) | 0x7f
+}
+
+pub fn QCMD(cmd: ::c_int, type_: ::c_int) -> ::c_int {
+    (cmd << 8) | (type_ & 0x00ff)
 }
