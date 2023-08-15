@@ -1125,6 +1125,13 @@ pub const POSIX_SPAWN_SETSIGMASK: ::c_int = 0x08;
 pub const POSIX_SPAWN_SETSCHEDPARAM: ::c_int = 0x10;
 pub const POSIX_SPAWN_SETSCHEDULER: ::c_int = 0x20;
 
+pub const WNOHANG: ::c_int = 0x00000001;
+pub const WUNTRACED: ::c_int = 0x00000002;
+pub const WSTOPPED: ::c_int = WUNTRACED;
+pub const WEXITED: ::c_int = 0x00000004;
+pub const WCONTINUED: ::c_int = 0x00000008;
+pub const WNOWAIT: ::c_int = 0x01000000;
+
 #[cfg_attr(
     feature = "rustc-dep-of-std",
     link(
