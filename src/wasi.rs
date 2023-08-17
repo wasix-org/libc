@@ -33,6 +33,7 @@ pub type time_t = c_longlong;
 pub type c_double = f64;
 pub type c_float = f32;
 pub type ino_t = u64;
+#[cfg(not(target_vendor = "wasmer"))]
 pub type sigset_t = c_uchar;
 pub type suseconds_t = c_longlong;
 pub type mode_t = u32;
@@ -61,20 +62,12 @@ pub type pthread_t = c_ulong;
 #[cfg(target_vendor = "wasmer")]
 pub type pthread_key_t = ::c_uint;
 
-#[cfg(target_vendor = "wasmer")]
-pub struct pthread_attr_t {
-    #[cfg(target_pointer_width = "32")]
-    __size: [u32; 8],
-    #[cfg(target_pointer_width = "64")]
-    __size: [u64; 7]
-}
-
 s! {
     #[repr(C)]
     pub struct in_addr {
         pub s_addr: ::in_addr_t,
     }
-    
+
     #[repr(C)]
     #[repr(align(4))]
     pub struct in6_addr {
@@ -261,6 +254,43 @@ s! {
     pub struct sock_fprog {
         pub len: ::c_ushort,
         pub filter: *mut sock_filter,
+    }
+
+    #[cfg(target_vendor = "wasmer")]
+    #[repr(C)]
+    pub struct pthread_attr_t {
+        #[cfg(target_pointer_width = "32")]
+        __size: [u32; 8],
+        #[cfg(target_pointer_width = "64")]
+        __size: [u64; 7],
+    }
+
+    #[cfg(target_vendor = "wasmer")]
+    #[repr(C)]
+    pub struct sigset_t {
+        #[cfg(target_pointer_width = "32")]
+        __val: [u32; 2],
+        #[cfg(target_pointer_width = "64")]
+        __val: [u64; 1],
+    }
+
+    #[cfg(target_vendor = "wasmer")]
+    #[repr(C)]
+    pub struct siginfo_t {
+        pub si_signo: ::c_int,
+        pub si_errno: ::c_int,
+        pub si_code: ::c_int,
+        _pad: [::c_int; 31],
+        _align: [u64; 0],
+    }
+
+    #[cfg(target_vendor = "wasmer")]
+    #[repr(C)]
+    pub struct sigaction {
+        pub sa_sigaction: ::sighandler_t,
+        pub sa_mask: ::sigset_t,
+        pub sa_flags: ::c_int,
+        pub sa_restorer: ::Option<extern fn()>,
     }
 }
 
@@ -843,13 +873,34 @@ pub const SIGHUP: ::c_int = 1;
 pub const SIGINT: ::c_int = 2;
 pub const SIGQUIT: ::c_int = 3;
 pub const SIGILL: ::c_int = 4;
+pub const SIGTRAP: ::c_int = 5;
 pub const SIGABRT: ::c_int = 6;
+pub const SIGBUS: ::c_int = 7;
 pub const SIGFPE: ::c_int = 8;
 pub const SIGKILL: ::c_int = 9;
+pub const SIGUSR1: ::c_int = 10;
 pub const SIGSEGV: ::c_int = 11;
+pub const SIGUSR2: ::c_int = 12;
 pub const SIGPIPE: ::c_int = 13;
 pub const SIGALRM: ::c_int = 14;
 pub const SIGTERM: ::c_int = 15;
+pub const SIGSTKFLT: c_int = 16;
+pub const SIGCHLD: c_int = 17;
+pub const SIGCONT: c_int = 18;
+pub const SIGSTOP: c_int = 19;
+pub const SIGTSTP: c_int = 20;
+pub const SIGTTIN: c_int = 21;
+pub const SIGTTOU: c_int = 22;
+pub const SIGURG: c_int = 23;
+pub const SIGXCPU: c_int = 24;
+pub const SIGXFSZ: c_int = 25;
+pub const SIGVTALRM: c_int = 26;
+pub const SIGPROF: c_int = 27;
+pub const SIGWINCH: c_int = 28;
+pub const SIGIO: c_int = 29;
+pub const SIGPOLL: c_int = 29;
+pub const SIGPWR: c_int = 30;
+pub const SIGSYS: c_int = 31;
 
 #[cfg(target_vendor = "wasmer")]
 pub const SIG_DFL: sighandler_t = 0 as sighandler_t;
@@ -857,6 +908,19 @@ pub const SIG_DFL: sighandler_t = 0 as sighandler_t;
 pub const SIG_IGN: sighandler_t = 1 as sighandler_t;
 #[cfg(target_vendor = "wasmer")]
 pub const SIG_ERR: sighandler_t = !0 as sighandler_t;
+
+pub const SIG_BLOCK: c_int = 0;
+pub const SIG_UNBLOCK: c_int = 1;
+pub const SIG_SETMASK: c_int = 2;
+
+pub const SA_NOCLDSTOP: c_int = 1;
+pub const SA_NOCLDWAIT: c_int = 2;
+pub const SA_SIGINFO: c_int = 4;
+pub const SA_ONSTACK: c_int = 0x08000000;
+pub const SA_RESTART: c_int = 0x10000000;
+pub const SA_NODEFER: c_int = 0x40000000;
+pub const SA_RESETHAND: c_int = 0x80000000;
+pub const SA_RESTORER: c_int = 0x04000000;
 
 pub const SEEK_SET: c_int = 0;
 pub const SEEK_CUR: c_int = 1;
@@ -1400,29 +1464,80 @@ extern "C" {
     pub fn localeconv() -> *mut lconv;
 
     pub fn accept(socket: ::c_int, addr: *mut sockaddr, addrlen: *mut socklen_t) -> ::c_int;
-    pub fn accept4(socket: ::c_int, addr: *mut sockaddr, addrlen: *mut socklen_t, flags: ::c_int) -> ::c_int;
+    pub fn accept4(
+        socket: ::c_int,
+        addr: *mut sockaddr,
+        addrlen: *mut socklen_t,
+        flags: ::c_int,
+    ) -> ::c_int;
     pub fn bind(socket: ::c_int, addr: *const ::sockaddr, addrlen: ::socklen_t) -> ::c_int;
     pub fn connect(socket: ::c_int, addr: *const sockaddr, addrlen: socklen_t) -> ::c_int;
     pub fn freeifaddrs(ifa: *mut ::ifaddrs);
     pub fn getifaddrs(ifap: *mut *mut ::ifaddrs) -> ::c_int;
     pub fn getpeername(socket: ::c_int, addr: *mut sockaddr, addrlen: *mut socklen_t) -> ::c_int;
     pub fn getsockname(socket: ::c_int, addr: *mut sockaddr, addrlen: *mut socklen_t) -> ::c_int;
-    pub fn getsockopt(sockfd: ::c_int, level: ::c_int, option_name: ::c_int, option_value: *mut ::c_void, option_len: *mut ::socklen_t) -> ::c_int;
+    pub fn getsockopt(
+        sockfd: ::c_int,
+        level: ::c_int,
+        option_name: ::c_int,
+        option_value: *mut ::c_void,
+        option_len: *mut ::socklen_t,
+    ) -> ::c_int;
     pub fn listen(socket: ::c_int, backlog: ::c_int) -> ::c_int;
-    pub fn recv(socket: ::c_int, buffer: *mut ::c_void, length: ::size_t, flags: ::c_int) -> ::ssize_t;
-    pub fn recvfrom(socket: ::c_int, buffer: *mut ::c_void, length: ::size_t, flags: ::c_int, addr: *mut ::sockaddr, addrlen: *mut ::socklen_t) -> ::ssize_t;
+    pub fn recv(
+        socket: ::c_int,
+        buffer: *mut ::c_void,
+        length: ::size_t,
+        flags: ::c_int,
+    ) -> ::ssize_t;
+    pub fn recvfrom(
+        socket: ::c_int,
+        buffer: *mut ::c_void,
+        length: ::size_t,
+        flags: ::c_int,
+        addr: *mut ::sockaddr,
+        addrlen: *mut ::socklen_t,
+    ) -> ::ssize_t;
     pub fn recvmsg(socket: ::c_int, msg: *mut ::msghdr, flags: ::c_int) -> ::ssize_t;
-    pub fn send(socket: ::c_int, buffer: *const ::c_void, length: ::size_t, flags: ::c_int) -> ::ssize_t;
-    pub fn sendfile(socket: ::c_int, in_fd: ::c_int, ofs: *const ::off_t, count: ::size_t) -> ::ssize_t;
+    pub fn send(
+        socket: ::c_int,
+        buffer: *const ::c_void,
+        length: ::size_t,
+        flags: ::c_int,
+    ) -> ::ssize_t;
+    pub fn sendfile(
+        socket: ::c_int,
+        in_fd: ::c_int,
+        ofs: *const ::off_t,
+        count: ::size_t,
+    ) -> ::ssize_t;
     pub fn sendmsg(socket: ::c_int, msg: *const ::msghdr, flags: ::c_int) -> ::ssize_t;
-    pub fn sendto(socket: ::c_int, buffer: *const ::c_void, length: ::size_t, flags: ::c_int, addr: *const sockaddr, addrlen: socklen_t) -> ::ssize_t;
-    pub fn setsockopt(socket: ::c_int, level: ::c_int, option_name: ::c_int, option_value: *const ::c_void, option_len: socklen_t) -> ::c_int;
+    pub fn sendto(
+        socket: ::c_int,
+        buffer: *const ::c_void,
+        length: ::size_t,
+        flags: ::c_int,
+        addr: *const sockaddr,
+        addrlen: socklen_t,
+    ) -> ::ssize_t;
+    pub fn setsockopt(
+        socket: ::c_int,
+        level: ::c_int,
+        option_name: ::c_int,
+        option_value: *const ::c_void,
+        option_len: socklen_t,
+    ) -> ::c_int;
     pub fn shutdown(socket: ::c_int, how: ::c_int) -> ::c_int;
     pub fn socket(domain: ::c_int, ty: ::c_int, protocol: ::c_int) -> ::c_int;
-    pub fn socketpair(domain: ::c_int, ty: ::c_int, protocol: ::c_int, socket_vector: *mut ::c_int) -> ::c_int;
+    pub fn socketpair(
+        domain: ::c_int,
+        ty: ::c_int,
+        protocol: ::c_int,
+        socket_vector: *mut ::c_int,
+    ) -> ::c_int;
 
     pub fn getpid() -> ::pid_t;
-    
+
     pub fn readlink(path: *const c_char, buf: *mut c_char, bufsz: ::size_t) -> ::ssize_t;
 
     pub fn timegm(tm: *mut ::tm) -> time_t;
@@ -1681,7 +1796,7 @@ extern "C" {
     pub fn waitpid(pid: pid_t, status: *mut ::c_int, options: ::c_int) -> pid_t;
     #[cfg(target_vendor = "wasmer")]
     pub fn kill(pid: pid_t, sig: ::c_int) -> ::c_int;
-    
+
     #[cfg(target_vendor = "wasmer")]
     pub fn sigemptyset(set: *mut sigset_t) -> ::c_int;
     #[cfg(target_vendor = "wasmer")]
@@ -1732,16 +1847,57 @@ extern "C" {
     pub fn pthread_getspecific(key: pthread_key_t) -> *mut ::c_void;
     #[cfg(target_vendor = "wasmer")]
     pub fn pthread_setspecific(key: pthread_key_t, value: *const ::c_void) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    pub fn raise(signum: ::c_int) -> ::c_int;
+
+    #[cfg(target_vendor = "wasmer")]
+    fn sigaction_external_default(
+        sig: ::c_int,
+        sa: *const sigaction,
+        old: *mut sigaction,
+        _external_handler: ::Option<unsafe extern "C" fn(::c_int)>
+    ) -> ::c_int;
+    #[cfg(target_vendor = "wasmer")]
+    fn __wasm_signal(signum: ::c_int);
+}
+
+#[cfg(target_vendor = "wasmer")]
+pub unsafe fn sigaction(
+    sig: ::c_int,
+    sa: *const sigaction,
+    old: *mut sigaction,
+) -> ::c_int {
+    sigaction_external_default(sig, sa, old, Some(default_handler))
+}
+
+#[cfg(target_vendor = "wasmer")]
+extern "C" fn default_handler(sig: ::c_int) {
+    if sig == SIGCHLD
+        || sig == SIGURG
+        || sig == SIGWINCH
+        || sig == SIGCONT {
+        return;
+    } else {
+        unsafe { abort() };
+    }
+}
+
+#[cfg(target_vendor = "wasmer")]
+mod wasm_signal {
+    #[no_mangle]
+    extern "C" fn __wasm_signal(signum: ::c_int) {
+        unsafe { super::__wasm_signal(signum) };
+    }
 }
 
 /// mocked functions that dont do anything in WASI land
-pub fn mlock(addr: *const ::c_void, len: ::size_t) -> ::c_int {
+pub fn mlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
     0
 }
-pub fn munlock(addr: *const ::c_void, len: ::size_t) -> ::c_int {
+pub fn munlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
     0
 }
-pub fn mlockall(flags: ::c_int) -> ::c_int {
+pub fn mlockall(_flags: ::c_int) -> ::c_int {
     0
 }
 pub fn munlockall() -> ::c_int {
