@@ -1819,6 +1819,8 @@ arc4random
 arc4random_buf
 arc4random_uniform
 arphdr
+asctime
+asctime_r
 attrgroup_t
 attribute_set_t
 attrlist
@@ -1845,6 +1847,8 @@ copyfile
 copyfile_flags_t
 cpu_subtype_t
 cpu_type_t
+ctime
+ctime_r
 ctl_info
 difftime
 dirfd
@@ -1867,6 +1871,7 @@ flistxattr
 fmemopen
 fmount
 forkpty
+freadlink
 freeifaddrs
 freelocale
 fremovexattr
@@ -1880,6 +1885,7 @@ futimes
 getattrlist
 getattrlistat
 getattrlistbulk
+getdate
 getdomainname
 getdtablesize
 getfsstat
@@ -1989,6 +1995,8 @@ memset_s
 mem_entry_name_port_t
 mincore
 mkdirat
+mkfifoat
+mknodat
 mkstemps
 mount
 msghdr
@@ -2033,12 +2041,14 @@ posix_spawn_file_actions_destroy
 posix_spawn_file_actions_init
 posix_spawn_file_actions_t
 posix_spawnattr_destroy
+posix_spawnattr_get_qos_class_np
 posix_spawnattr_getarchpref_np
 posix_spawnattr_getflags
 posix_spawnattr_getpgroup
 posix_spawnattr_getsigdefault
 posix_spawnattr_getsigmask
 posix_spawnattr_init
+posix_spawnattr_set_qos_class_np
 posix_spawnattr_setarchpref_np
 posix_spawnattr_setflags
 posix_spawnattr_setpgroup
@@ -2179,8 +2189,10 @@ stack_t
 statfs
 strcasecmp
 strcasestr
+strftime
 strncasecmp
 strndup
+strptime
 strsignal
 strtonum
 sync
