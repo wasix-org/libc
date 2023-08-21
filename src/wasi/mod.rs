@@ -1,5 +1,4 @@
 use super::{Send, Sync};
-use core::iter::Iterator;
 
 pub use ffi::c_void;
 
@@ -10,14 +9,17 @@ pub type c_int = i32;
 pub type c_uint = u32;
 pub type c_short = i16;
 pub type c_ushort = u16;
-#[cfg(target_arch = "wasm32")]
-pub type c_long = i32;
-#[cfg(target_arch = "wasm32")]
-pub type c_ulong = u32;
-#[cfg(target_arch = "wasm64")]
-pub type c_long = i64;
-#[cfg(target_arch = "wasm64")]
-pub type c_ulong = u64;
+
+cfg_if! {
+    if #[cfg(target_arch = "wasm64")] {
+        pub type c_long = i64;
+        pub type c_ulong = u64;
+    } else {
+        pub type c_long = i32;
+        pub type c_ulong = u32;
+    }
+}
+
 pub type c_longlong = i64;
 pub type c_ulonglong = u64;
 pub type intmax_t = i64;
@@ -760,6 +762,11 @@ s! {
         pub tms_cstime: clock_t,
     }
 
+    pub struct itimerspec {
+        pub it_interval: timespec,
+        pub it_value: timespec,
+    }
+
     pub struct iovec {
         pub iov_base: *mut c_void,
         pub iov_len: size_t,
@@ -824,6 +831,7 @@ s! {
     pub struct fd_set {
         __nfds: usize,
         __fds: [c_int; FD_SETSIZE as usize],
+    }
 
     pub struct sched_param {
         pub sched_priority: ::c_int,
@@ -973,14 +981,14 @@ pub const AT_SYMLINK_FOLLOW: c_int = 0x2;
 pub const AT_REMOVEDIR: c_int = 0x4;
 pub const UTIME_OMIT: c_long = 0xfffffffe;
 pub const UTIME_NOW: c_long = 0xffffffff;
-pub const S_IFIFO: mode_t = 0o1_0000;
+pub const S_IFIFO: mode_t = 49152;
 pub const S_IFCHR: mode_t = 8192;
 pub const S_IFBLK: mode_t = 24576;
 pub const S_IFDIR: mode_t = 16384;
 pub const S_IFREG: mode_t = 32768;
 pub const S_IFLNK: mode_t = 40960;
 pub const S_IFSOCK: mode_t = 49152;
-pub const S_IFMT: mode_t = 0o17_0000;
+pub const S_IFMT: mode_t = 57344;
 pub const S_IRWXO: mode_t = 0x7;
 pub const S_IXOTH: mode_t = 0x1;
 pub const S_IWOTH: mode_t = 0x2;
@@ -1101,26 +1109,12 @@ pub const _SC_IOV_MAX: c_int = 60;
 pub const _SC_NPROCESSORS_ONLN: ::c_int = 84;
 pub const _SC_SYMLOOP_MAX: c_int = 173;
 
-cfg_if! {
-    if #[cfg(libc_ctest)] {
-        // skip these constants when this is active because `ctest` currently
-        // panics on parsing the constants below
-    } else {
-        // `addr_of!(EXTERN_STATIC)` is now safe; remove `unsafe` when MSRV >= 1.82
-        #[allow(unused_unsafe)]
-        pub static CLOCK_MONOTONIC: clockid_t =
-            unsafe { clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC)) };
-        #[allow(unused_unsafe)]
-        pub static CLOCK_PROCESS_CPUTIME_ID: clockid_t =
-            unsafe { clockid_t(ptr_addr_of!(_CLOCK_PROCESS_CPUTIME_ID)) };
-        #[allow(unused_unsafe)]
-        pub static CLOCK_REALTIME: clockid_t =
-            unsafe { clockid_t(ptr_addr_of!(_CLOCK_REALTIME)) };
-        #[allow(unused_unsafe)]
-        pub static CLOCK_THREAD_CPUTIME_ID: clockid_t =
-            unsafe { clockid_t(ptr_addr_of!(_CLOCK_THREAD_CPUTIME_ID)) };
-    }
-}
+pub static CLOCK_MONOTONIC: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC)) };
+pub static CLOCK_PROCESS_CPUTIME_ID: clockid_t =
+    unsafe { clockid_t(ptr_addr_of!(_CLOCK_PROCESS_CPUTIME_ID)) };
+pub static CLOCK_REALTIME: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_REALTIME)) };
+pub static CLOCK_THREAD_CPUTIME_ID: clockid_t =
+    unsafe { clockid_t(ptr_addr_of!(_CLOCK_THREAD_CPUTIME_ID)) };
 
 pub const ABDAY_1: ::nl_item = 0x20000;
 pub const ABDAY_2: ::nl_item = 0x20001;
@@ -1396,6 +1390,7 @@ extern "C" {
     pub fn getchar_unlocked() -> ::c_int;
     pub fn putchar_unlocked(c: ::c_int) -> ::c_int;
 
+    pub fn shutdown(socket: ::c_int, how: ::c_int) -> ::c_int;
     pub fn fstat(fildes: ::c_int, buf: *mut stat) -> ::c_int;
     pub fn mkdir(path: *const c_char, mode: mode_t) -> ::c_int;
     pub fn stat(path: *const c_char, buf: *mut stat) -> ::c_int;
@@ -1503,6 +1498,8 @@ extern "C" {
     pub fn strerror_r(errnum: ::c_int, buf: *mut c_char, buflen: ::size_t) -> ::c_int;
 
     pub fn usleep(secs: ::c_uint) -> ::c_int;
+    pub fn send(socket: ::c_int, buf: *const ::c_void, len: ::size_t, flags: ::c_int) -> ::ssize_t;
+    pub fn recv(socket: ::c_int, buf: *mut ::c_void, len: ::size_t, flags: ::c_int) -> ::ssize_t;
     pub fn poll(fds: *mut pollfd, nfds: nfds_t, timeout: ::c_int) -> ::c_int;
     pub fn setlocale(category: ::c_int, locale: *const ::c_char) -> *mut ::c_char;
     pub fn localeconv() -> *mut lconv;
@@ -1528,12 +1525,6 @@ extern "C" {
         option_len: *mut ::socklen_t,
     ) -> ::c_int;
     pub fn listen(socket: ::c_int, backlog: ::c_int) -> ::c_int;
-    pub fn recv(
-        socket: ::c_int,
-        buffer: *mut ::c_void,
-        length: ::size_t,
-        flags: ::c_int,
-    ) -> ::ssize_t;
     pub fn recvfrom(
         socket: ::c_int,
         buffer: *mut ::c_void,
@@ -1543,12 +1534,6 @@ extern "C" {
         addrlen: *mut ::socklen_t,
     ) -> ::ssize_t;
     pub fn recvmsg(socket: ::c_int, msg: *mut ::msghdr, flags: ::c_int) -> ::ssize_t;
-    pub fn send(
-        socket: ::c_int,
-        buffer: *const ::c_void,
-        length: ::size_t,
-        flags: ::c_int,
-    ) -> ::ssize_t;
     pub fn sendfile(
         socket: ::c_int,
         in_fd: ::c_int,
@@ -1571,7 +1556,6 @@ extern "C" {
         option_value: *const ::c_void,
         option_len: socklen_t,
     ) -> ::c_int;
-    pub fn shutdown(socket: ::c_int, how: ::c_int) -> ::c_int;
     pub fn socket(domain: ::c_int, ty: ::c_int, protocol: ::c_int) -> ::c_int;
     pub fn socketpair(
         domain: ::c_int,
