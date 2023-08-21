@@ -1855,27 +1855,20 @@ extern "C" {
         sig: ::c_int,
         sa: *const sigaction,
         old: *mut sigaction,
-        _external_handler: ::Option<unsafe extern "C" fn(::c_int)>
+        _external_handler: ::Option<unsafe extern "C" fn(::c_int)>,
     ) -> ::c_int;
     #[cfg(target_vendor = "wasmer")]
     fn __wasm_signal(signum: ::c_int);
 }
 
 #[cfg(target_vendor = "wasmer")]
-pub unsafe fn sigaction(
-    sig: ::c_int,
-    sa: *const sigaction,
-    old: *mut sigaction,
-) -> ::c_int {
-    sigaction_external_default(sig, sa, old, Some(default_handler))
+pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
+    sigaction_external_default(sig, sa, old, ::Option::Some(default_handler))
 }
 
 #[cfg(target_vendor = "wasmer")]
 extern "C" fn default_handler(sig: ::c_int) {
-    if sig == SIGCHLD
-        || sig == SIGURG
-        || sig == SIGWINCH
-        || sig == SIGCONT {
+    if sig == SIGCHLD || sig == SIGURG || sig == SIGWINCH || sig == SIGCONT {
         return;
     } else {
         unsafe { abort() };
