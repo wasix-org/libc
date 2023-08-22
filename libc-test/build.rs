@@ -283,6 +283,7 @@ fn test_apple(target: &str) {
         "sys/uio.h",
         "sys/un.h",
         "sys/utsname.h",
+        "sys/vsock.h",
         "sys/wait.h",
         "sys/xattr.h",
         "syslog.h",
@@ -348,6 +349,9 @@ fn test_apple(target: &str) {
 
             // FIXME: ABI has been changed on recent macOSes.
             "os_unfair_lock_assert_owner" | "os_unfair_lock_assert_not_owner" => true,
+
+            // FIXME: Once the SDK get updated to Ventura's level
+            "freadlink" | "mknodat" | "mkfifoat" => true,
 
             _ => false,
         }
@@ -638,7 +642,7 @@ fn test_windows(target: &str) {
 
             // Windows uppercase structs don't have `struct` in front:
             t if is_struct => {
-                if ty.clone().chars().next().unwrap().is_uppercase() {
+                if ty.chars().next().unwrap().is_uppercase() {
                     t.to_string()
                 } else if t == "stat" {
                     "struct __stat64".to_string()
@@ -1799,7 +1803,42 @@ fn test_android(target: &str) {
             | "MADV_POPULATE_WRITE" => true,
 
             // kernel 5.6 minimum required
-            "IPPROTO_MPTCP" => true,
+            "IPPROTO_MPTCP" | "IPPROTO_ETHERNET" => true,
+
+            // FIXME: NDK r22 minimum required
+            | "FDB_NOTIFY_BIT"
+            | "FDB_NOTIFY_INACTIVE_BIT"
+            | "IFLA_ALT_IFNAME"
+            | "IFLA_PERM_ADDRESS"
+            | "IFLA_PROP_LIST"
+            | "IFLA_PROTO_DOWN_REASON"
+            | "NDA_FDB_EXT_ATTRS"
+            | "NDA_NH_ID"
+            | "NFEA_ACTIVITY_NOTIFY"
+            | "NFEA_DONT_REFRESH"
+            | "NFEA_UNSPEC" => true,
+
+            // FIXME: NDK r23 minimum required
+            | "IFLA_PARENT_DEV_BUS_NAME"
+            | "IFLA_PARENT_DEV_NAME" => true,
+
+            // FIXME: NDK r25 minimum required
+            | "IFLA_GRO_MAX_SIZE"
+            | "NDA_FLAGS_EXT"
+            | "NTF_EXT_MANAGED" => true,
+
+            // FIXME: NDK above r25 required
+            | "IFLA_ALLMULTI"
+            | "IFLA_DEVLINK_PORT"
+            | "IFLA_GRO_IPV4_MAX_SIZE"
+            | "IFLA_GSO_IPV4_MAX_SIZE"
+            | "IFLA_TSO_MAX_SEGS"
+            | "IFLA_TSO_MAX_SIZE"
+            | "NDA_NDM_STATE_MASK"
+            | "NDA_NDM_FLAGS_MASK"
+            | "NDTPA_INTERVAL_PROBE_TIME_MS"
+            | "NFQA_UNSPEC"
+            | "NTF_EXT_LOCKED" => true,
 
             _ => false,
         }
@@ -2979,7 +3018,8 @@ fn test_neutrino(target: &str) {
     cfg.skip_field(move |struct_, field| {
         (struct_ == "__sched_param" && field == "reserved") ||
         (struct_ == "sched_param" && field == "reserved") ||
-        (struct_ == "sigevent" && field == "__sigev_un1") || // union
+        (struct_ == "sigevent" && field == "__padding1") || // ensure alignment
+        (struct_ == "sigevent" && field == "__padding2") || // union
         (struct_ == "sigevent" && field == "__sigev_un2") || // union
         // sighandler_t type is super weird
         (struct_ == "sigaction" && field == "sa_sigaction") ||
@@ -3306,6 +3346,7 @@ fn test_linux(target: &str) {
         "linux/seccomp.h",
         "linux/sock_diag.h",
         "linux/sockios.h",
+        "linux/tls.h",
         "linux/uinput.h",
         "linux/vm_sockets.h",
         "linux/wait.h",
@@ -3333,8 +3374,8 @@ fn test_linux(target: &str) {
             "Ioctl" if gnu => "unsigned long".to_string(),
             "Ioctl" => "int".to_string(),
 
-            // In MUSL `flock64` is a typedef to `flock`.
-            "flock64" if musl => format!("struct {}", ty),
+            // LFS64 types have been removed in musl 1.2.4+
+            "off64_t" if musl => "off_t".to_string(),
 
             // typedefs don't need any keywords
             t if t.ends_with("_t") => t.to_string(),
@@ -3399,7 +3440,14 @@ fn test_linux(target: &str) {
             "priority_t" if musl => true,
             "name_t" if musl => true,
 
-            _ => false,
+            t => {
+                if musl {
+                    // LFS64 types have been removed in musl 1.2.4+
+                    t.ends_with("64") || t.ends_with("64_t")
+                } else {
+                    false
+                }
+            }
         }
     });
 
@@ -3409,6 +3457,10 @@ fn test_linux(target: &str) {
         }
         // FIXME: musl CI has old headers
         if musl && ty.starts_with("uinput_") {
+            return true;
+        }
+        // LFS64 types have been removed in musl 1.2.4+
+        if musl && (ty.ends_with("64") || ty.ends_with("64_t")) {
             return true;
         }
         // FIXME: sparc64 CI has old headers
@@ -3528,6 +3580,10 @@ fn test_linux(target: &str) {
             {
                 return true;
             }
+            // LFS64 types have been removed in musl 1.2.4+
+            if name.starts_with("RLIM64") {
+                return true;
+            }
         }
         match name {
             // These constants are not available if gnu headers have been included
@@ -3581,6 +3637,7 @@ fn test_linux(target: &str) {
 
             // IPPROTO_MAX was increased in 5.6 for IPPROTO_MPTCP:
             | "IPPROTO_MAX"
+            | "IPPROTO_ETHERNET"
             | "IPPROTO_MPTCP" => true,
 
             // FIXME: Not currently available in headers

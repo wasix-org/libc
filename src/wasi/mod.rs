@@ -9,8 +9,15 @@ pub type c_int = i32;
 pub type c_uint = u32;
 pub type c_short = i16;
 pub type c_ushort = u16;
-pub type c_long = i32;
-pub type c_ulong = u32;
+cfg_if! {
+    if #[cfg(target_arch = "wasm64")] {
+        pub type c_long = i64;
+        pub type c_ulong = u64;
+    } else {
+        pub type c_long = i32;
+        pub type c_ulong = u32;
+    }
+}
 pub type c_longlong = i64;
 pub type c_ulonglong = u64;
 pub type intmax_t = i64;
@@ -27,7 +34,6 @@ pub type time_t = c_longlong;
 pub type c_double = f64;
 pub type c_float = f32;
 pub type ino_t = u64;
-pub type sigset_t = c_uchar;
 pub type suseconds_t = c_longlong;
 pub type mode_t = u32;
 pub type dev_t = u64;
@@ -190,6 +196,9 @@ pub struct dirent {
     pub d_name: [c_char; 0],
 }
 
+pub const INT_MIN: c_int = -2147483648;
+pub const INT_MAX: c_int = 2147483647;
+
 pub const EXIT_SUCCESS: c_int = 0;
 pub const EXIT_FAILURE: c_int = 1;
 pub const STDIN_FILENO: c_int = 0;
@@ -205,6 +214,8 @@ pub const F_GETFD: c_int = 1;
 pub const F_SETFD: c_int = 2;
 pub const F_GETFL: c_int = 3;
 pub const F_SETFL: c_int = 4;
+pub const F_DUPFD: c_int = 5;
+pub const F_DUPFD_CLOEXEC: c_int = 6;
 pub const FD_CLOEXEC: c_int = 1;
 pub const FD_SETSIZE: size_t = 1024;
 pub const O_APPEND: c_int = 0x0001;
@@ -363,6 +374,7 @@ pub const EWOULDBLOCK: c_int = EAGAIN;
 pub const _SC_PAGESIZE: c_int = 30;
 pub const _SC_PAGE_SIZE: ::c_int = _SC_PAGESIZE;
 pub const _SC_IOV_MAX: c_int = 60;
+pub const _SC_NPROCESSORS_ONLN: ::c_int = 84;
 pub const _SC_SYMLOOP_MAX: c_int = 173;
 
 pub static CLOCK_MONOTONIC: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC)) };
@@ -827,4 +839,14 @@ extern "C" {
     pub fn arc4random_uniform(a: u32) -> u32;
 
     pub fn __errno_location() -> *mut ::c_int;
+}
+
+cfg_if! {
+    if #[cfg(target_vendor = "wasmer")] {
+        mod wasix;
+        pub use self::wasix::*;
+    } else {
+        mod wasi;
+        pub use self::wasi::*;
+    }
 }
