@@ -46,6 +46,7 @@ s! {
         pub sin6_flowinfo: u32,
         pub sin6_addr: ::in6_addr,
         pub sin6_scope_id: u32,
+        __padding: [u8; 4],
     }
 
     #[repr(C)]
