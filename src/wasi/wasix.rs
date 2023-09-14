@@ -6,6 +6,9 @@ pub type in_addr_t = u32;
 pub type in_port_t = u16;
 pub type sa_family_t = u16;
 pub type sa_type_t = u16;
+pub type c_cc = ::c_uchar;
+pub type speed_t = ::c_uint;
+pub type tcflag_t = ::c_uint;
 
 s! {
     #[repr(C)]
@@ -263,6 +266,24 @@ s! {
         __prio: ::c_int,
         __policy: ::c_int,
         __pad: [::c_int; 16],
+    }
+
+    pub struct termios {
+        c_iflag: ::tcflag_t,
+        c_oflag: ::tcflag_t,
+        c_cflag: ::tcflag_t,
+        c_lflag: ::tcflag_t,
+        c_line: ::c_cc,
+        c_cc: [::c_cc; NCCS],
+        __c_ispeed: ::speed_t,
+        __c_ospeed: ::speed_t,
+    }
+
+    pub struct winsize {
+        pub ws_row: ::c_ushort,
+        pub ws_col: ::c_ushort,
+        pub ws_xpixel: ::c_ushort,
+        pub ws_ypixel: ::c_ushort,
     }
 }
 
@@ -740,6 +761,14 @@ pub const SA_NODEFER: ::c_int = 0x40000000;
 pub const SA_RESETHAND: ::c_int = 0x80000000;
 pub const SA_RESTORER: ::c_int = 0x04000000;
 
+pub const NCCS: usize = 32;
+
+pub const TCSANOW: ::c_int = 0;
+pub const TCSADRAIN: ::c_int = 1;
+pub const TCSAFLUSH: ::c_int = 2;
+
+pub const TIOCGWINSZ: ::c_int = 0x101;
+
 #[cfg_attr(
     feature = "rustc-dep-of-std",
     link(
@@ -953,6 +982,20 @@ extern "C" {
     pub fn pthread_key_delete(key: pthread_key_t) -> ::c_int;
     pub fn pthread_getspecific(key: pthread_key_t) -> *mut ::c_void;
     pub fn pthread_setspecific(key: pthread_key_t, value: *const ::c_void) -> ::c_int;
+
+    pub fn cfmakeraw(termios: *mut ::termios);
+    pub fn cfgetispeed(termios: *const ::termios) -> ::speed_t;
+    pub fn cfgetospeed(termios: *const ::termios) -> ::speed_t;
+    pub fn cfsetispeed(termios: *mut ::termios, speed: ::speed_t) -> ::c_int;
+    pub fn cfsetospeed(termios: *mut ::termios, speed: ::speed_t) -> ::c_int;
+    pub fn tcdrain(fd: ::c_int) -> ::c_int;
+    pub fn tcgetattr(fd: ::c_int, termios: *mut ::termios) -> ::c_int;
+    pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const ::termios) -> ::c_int;
+    pub fn tcflow(fd: ::c_int, action: ::c_int) -> ::c_int;
+    pub fn tcflush(fd: ::c_int, action: ::c_int) -> ::c_int;
+    pub fn tcgetsid(fd: ::c_int) -> ::pid_t;
+    pub fn tcsendbreak(fd: ::c_int, duration: ::c_int) -> ::c_int;
+
     pub fn raise(signum: ::c_int) -> ::c_int;
 
     fn sigaction_external_default(
