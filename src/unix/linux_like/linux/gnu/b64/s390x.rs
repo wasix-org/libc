@@ -230,7 +230,7 @@ cfg_if! {
         impl Eq for fpreg_t {}
 
         impl ::fmt::Debug for fpreg_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpreg_t")
                     .field("d", &self.d)
                     .finish()

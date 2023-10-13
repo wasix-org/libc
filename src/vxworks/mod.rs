@@ -463,7 +463,7 @@ s_no_extra_traits! {
 cfg_if! {
     if #[cfg(feature = "extra_traits")] {
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_ino", &self.d_ino)
                     .field("d_name", &&self.d_name[..])
@@ -472,7 +472,7 @@ cfg_if! {
         }
 
         impl ::fmt::Debug for sockaddr_un {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_un")
                     .field("sun_len", &self.sun_len)
                     .field("sun_family", &self.sun_family)
@@ -482,7 +482,7 @@ cfg_if! {
         }
 
         impl ::fmt::Debug for RTP_DESC {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("RTP_DESC")
                     .field("status", &self.status)
                     .field("options", &self.options)
@@ -497,7 +497,7 @@ cfg_if! {
             }
         }
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -525,7 +525,7 @@ cfg_if! {
         }
         impl Eq for sa_u_t {}
         impl ::fmt::Debug for sa_u_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     let h = match self.sa_handler {
                         Some(handler) => handler as usize,
@@ -557,7 +557,7 @@ cfg_if! {
         }
         impl Eq for sigval {}
         impl ::fmt::Debug for sigval {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigval")
                     .field("sival_ptr", unsafe { &(self.sival_ptr as usize) })
                     .finish()

@@ -38,8 +38,8 @@ cfg_if! {
         use core::iter;
         #[allow(unused_imports)]
         use core::ops;
-        #[allow(unused_imports)]
-        use core::option;
+        // #[allow(unused_imports)]
+        // use core::option;
     }
 }
 

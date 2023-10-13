@@ -770,7 +770,7 @@ cfg_if! {
         }
         impl Eq for sigevent {}
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -802,7 +802,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_un {}
         impl ::fmt::Debug for sockaddr_un {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_un")
                     .field("sun_len", &self.sun_len)
                     .field("sun_family", &self.sun_family)
@@ -827,7 +827,7 @@ cfg_if! {
         }
         impl Eq for sigset_t {}
         impl ::fmt::Debug for sigset_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigset_t")
                     .field("__val", &self.__val)
                     .finish()
@@ -841,7 +841,7 @@ cfg_if! {
 
         // msg
         impl ::fmt::Debug for msg {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("msg")
                     .field("msg_next", &self.msg_next)
                     .field("msg_type", &self.msg_type)
@@ -853,7 +853,7 @@ cfg_if! {
 
         // msqid_ds
         impl ::fmt::Debug for msqid_ds {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("msqid_ds")
                     .field("msg_perm", &self.msg_perm)
                     .field("msg_first", &self.msg_first)
@@ -871,7 +871,7 @@ cfg_if! {
 
         // sockaddr_dl
         impl ::fmt::Debug for sockaddr_dl {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_dl")
                     .field("sdl_len", &self.sdl_len)
                     .field("sdl_family", &self.sdl_family)
@@ -916,7 +916,7 @@ cfg_if! {
 
         // sync_t
         impl ::fmt::Debug for sync_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sync_t")
                     .field("__owner", &self.__owner)
                     .field("__u", &self.__u)
@@ -926,7 +926,7 @@ cfg_if! {
 
         // pthread_barrier_t
         impl ::fmt::Debug for pthread_barrier_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_barrier_t")
                     .field("__pad", &self.__pad)
                     .finish()
@@ -935,7 +935,7 @@ cfg_if! {
 
         // pthread_rwlock_t
         impl ::fmt::Debug for pthread_rwlock_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_rwlock_t")
                     .field("__active", &self.__active)
                     .field("__blockedwriters", &self.__blockedwriters)
@@ -952,7 +952,7 @@ cfg_if! {
 
         // syspage_entry
         impl ::fmt::Debug for syspage_entry {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("syspage_entry")
                     .field("size", &self.size)
                     .field("total_size", &self.total_size)
@@ -1013,7 +1013,7 @@ cfg_if! {
         impl Eq for utsname {}
 
         impl ::fmt::Debug for utsname {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utsname")
                 // FIXME: .field("sysname", &self.sysname)
                 // FIXME: .field("nodename", &self.nodename)
@@ -1049,7 +1049,7 @@ cfg_if! {
         impl Eq for mq_attr {}
 
         impl ::fmt::Debug for mq_attr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mq_attr")
                     .field("mq_maxmsg", &self.mq_maxmsg)
                     .field("mq_msgsize", &self.mq_msgsize)
@@ -1089,7 +1089,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -1127,7 +1127,7 @@ cfg_if! {
         impl Eq for dirent {}
 
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_ino", &self.d_ino)
                     .field("d_offset", &self.d_offset)

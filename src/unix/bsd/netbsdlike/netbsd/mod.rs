@@ -907,7 +907,7 @@ cfg_if! {
         impl Eq for utmpx {}
 
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     .field("ut_name", &self.ut_name)
                     .field("ut_id", &self.ut_id)
@@ -956,7 +956,7 @@ cfg_if! {
         impl Eq for lastlogx {}
 
         impl ::fmt::Debug for lastlogx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("lastlogx")
                     .field("ll_tv", &self.ll_tv)
                     .field("ll_line", &self.ll_line)
@@ -983,7 +983,7 @@ cfg_if! {
         }
         impl Eq for in_pktinfo {}
         impl ::fmt::Debug for in_pktinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("in_pktinfo")
                     .field("ipi_addr", &self.ipi_addr)
                     .field("ipi_ifindex", &self.ipi_ifindex)
@@ -1008,7 +1008,7 @@ cfg_if! {
         }
         impl Eq for arphdr {}
         impl ::fmt::Debug for arphdr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ar_hrd = self.ar_hrd;
                 let ar_pro = self.ar_pro;
                 let ar_op = self.ar_op;
@@ -1041,7 +1041,7 @@ cfg_if! {
         }
         impl Eq for in_addr {}
         impl ::fmt::Debug for in_addr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let s_addr = self.s_addr;
                 f.debug_struct("in_addr")
                     .field("s_addr", &s_addr)
@@ -1063,7 +1063,7 @@ cfg_if! {
         }
         impl Eq for ip_mreq {}
         impl ::fmt::Debug for ip_mreq {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ip_mreq")
                     .field("imr_multiaddr", &self.imr_multiaddr)
                     .field("imr_interface", &self.imr_interface)
@@ -1088,7 +1088,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_in {}
         impl ::fmt::Debug for sockaddr_in {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_in")
                     .field("sin_len", &self.sin_len)
                     .field("sin_family", &self.sin_family)
@@ -1123,7 +1123,7 @@ cfg_if! {
         }
         impl Eq for dirent {}
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_fileno", &self.d_fileno)
                     .field("d_reclen", &self.d_reclen)
@@ -1181,7 +1181,7 @@ cfg_if! {
         }
         impl Eq for statvfs {}
         impl ::fmt::Debug for statvfs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("statvfs")
                     .field("f_flag", &self.f_flag)
                     .field("f_bsize", &self.f_bsize)
@@ -1254,7 +1254,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_storage {}
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -1285,7 +1285,7 @@ cfg_if! {
         }
         impl Eq for sigevent {}
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -1319,7 +1319,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_posix_spawn_fae {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     f.debug_struct("__c_anonymous_posix_fae")
                         .field("open", &self.open)
@@ -1354,7 +1354,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifc_ifcu {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     f.debug_struct("__c_anonymous_ifc_ifcu")
                         .field("ifcu_buf", &self.ifcu_buf)

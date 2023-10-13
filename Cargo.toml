@@ -9,7 +9,7 @@ homepage = "https://github.com/rust-lang/libc"
 documentation = "https://docs.rs/libc/"
 keywords = ["libc", "ffi", "bindings", "operating", "system"]
 categories = ["external-ffi-bindings", "no-std", "os"]
-build = "build.rs"
+build = "build/build.rs"
 exclude = ["/ci/*", "/.github/*", "/.cirrus.yml", "/triagebot.toml"]
 description = """
 Raw FFI bindings to platform libraries like libc.
@@ -139,6 +139,10 @@ extra_traits = []
 const-extern-fn = []
 # use_std is deprecated, use `std` instead
 use_std = ['std']
+
+# This feature is enabled automatically by the build script. It controls
+# whether the __wasm_signal function is exported from this library.
+export-wasm-signal = []
 
 [workspace]
 members = ["libc-test"]

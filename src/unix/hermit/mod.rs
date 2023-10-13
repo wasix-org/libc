@@ -114,7 +114,7 @@ cfg_if! {
         }
         impl Eq for dirent {}
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_ino", &self.d_ino)
                     .field("d_off", &self.d_off)
@@ -144,7 +144,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_un {}
         impl ::fmt::Debug for sockaddr_un {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_un")
                     .field("sun_family", &self.sun_family)
                     // FIXME: .field("sun_path", &self.sun_path)
@@ -171,7 +171,7 @@ cfg_if! {
         }
         impl Eq for sockaddr {}
         impl ::fmt::Debug for sockaddr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr")
                     .field("sa_len", &self.sa_len)
                     .field("sa_family", &self.sa_family)
@@ -202,7 +202,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_in {}
         impl ::fmt::Debug for sockaddr_in {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_in")
                     .field("sin_len", &self.sin_len)
                     .field("sin_family", &self.sin_family)
@@ -232,7 +232,7 @@ cfg_if! {
         }
         impl Eq for fd_set {}
         impl ::fmt::Debug for fd_set {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fd_set")
                     // FIXME: .field("fds_bits", &self.fds_bits)
                     .finish()
@@ -264,7 +264,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_storage {}
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("s2_len", &self.s2_len)
                     .field("ss_family", &self.ss_family)
@@ -311,7 +311,7 @@ cfg_if! {
         }
         impl Eq for stat {}
         impl ::fmt::Debug for stat {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("stat")
                     .field("st_dev", &self.st_dev)
                     .field("st_ino", &self.st_ino)

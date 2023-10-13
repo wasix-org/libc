@@ -630,7 +630,7 @@ cfg_if! {
         impl Eq for dirent {}
 
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_fileno", &self.d_fileno)
                     .field("d_off", &self.d_off)
@@ -663,7 +663,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -690,7 +690,7 @@ cfg_if! {
         impl Eq for siginfo_t {}
 
         impl ::fmt::Debug for siginfo_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("siginfo_t")
                     .field("si_signo", &self.si_signo)
                     .field("si_code", &self.si_code)
@@ -728,7 +728,7 @@ cfg_if! {
         impl Eq for lastlog {}
 
         impl ::fmt::Debug for lastlog {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("lastlog")
                     .field("ll_time", &self.ll_time)
                 // FIXME: .field("ll_line", &self.ll_line)
@@ -769,7 +769,7 @@ cfg_if! {
         impl Eq for utmp {}
 
         impl ::fmt::Debug for utmp {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmp")
                 // FIXME: .field("ut_line", &self.ut_line)
                 // FIXME: .field("ut_name", &self.ut_name)
@@ -802,7 +802,7 @@ cfg_if! {
         impl Eq for mount_info { }
 
         impl ::fmt::Debug for mount_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mount_info")
                 // FIXME: .field("align", &self.align)
                     .finish()
@@ -891,7 +891,7 @@ cfg_if! {
                 impl Eq for statfs { }
 
                 impl ::fmt::Debug for statfs {
-                    fn fmt(&self, f: &mut ::fmt::Formatter)
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>)
                            -> ::fmt::Result {
                         f.debug_struct("statfs")
                             .field("f_flags", &self.f_flags)

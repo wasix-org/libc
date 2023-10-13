@@ -294,7 +294,7 @@ cfg_if! {
         impl Eq for user_fpxregs_struct {}
 
         impl ::fmt::Debug for user_fpxregs_struct {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("user_fpxregs_struct")
                     .field("cwd", &self.cwd)
                     .field("swd", &self.swd)
@@ -345,7 +345,7 @@ cfg_if! {
         impl Eq for ucontext_t {}
 
         impl ::fmt::Debug for ucontext_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ucontext_t")
                     .field("uc_flags", &self.uc_flags)
                     .field("uc_link", &self.uc_link)

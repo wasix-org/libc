@@ -122,7 +122,7 @@ cfg_if! {
                 }
                 impl Eq for __c_anonymous_uc_sigmask {}
                 impl ::fmt::Debug for __c_anonymous_uc_sigmask {
-                    fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                         f.debug_struct("uc_sigmask")
                             .field("uc_sigmask", unsafe { &self.uc_sigmask })
                             .finish()
@@ -200,7 +200,7 @@ cfg_if! {
         }
         impl Eq for _libc_fpxreg {}
         impl ::fmt::Debug for _libc_fpxreg {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("_libc_fpxreg")
                     .field("significand", &self.significand)
                     .field("exponent", &self.exponent)
@@ -233,7 +233,7 @@ cfg_if! {
         }
         impl Eq for _libc_fpstate {}
         impl ::fmt::Debug for _libc_fpstate {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("_libc_fpstate")
                     .field("cwd", &self.cwd)
                     .field("swd", &self.swd)
@@ -274,7 +274,7 @@ cfg_if! {
         }
         impl Eq for mcontext_t {}
         impl ::fmt::Debug for mcontext_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mcontext_t")
                     .field("gregs", &self.gregs)
                     .field("fpregs", &self.fpregs)
@@ -302,7 +302,7 @@ cfg_if! {
         }
         impl Eq for ucontext_t {}
         impl ::fmt::Debug for ucontext_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ucontext_t")
                     .field("uc_flags", &self.uc_flags)
                     .field("uc_link", &self.uc_link)
@@ -347,7 +347,7 @@ cfg_if! {
         impl Eq for user_fpregs_struct {}
 
         impl ::fmt::Debug for user_fpregs_struct {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("user_fpregs_struct")
                     .field("cwd", &self.cwd)
                     .field("swd", &self.swd)

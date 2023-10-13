@@ -1445,7 +1445,7 @@ cfg_if! {
                 }
                 impl Eq for semun {}
                 impl ::fmt::Debug for semun {
-                    fn fmt(&self, f: &mut ::fmt::Formatter)
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>)
                            -> ::fmt::Result {
                         f.debug_struct("semun")
                             .field("val", unsafe { &self.val })
@@ -1476,7 +1476,7 @@ cfg_if! {
         }
         impl Eq for kevent {}
         impl ::fmt::Debug for kevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ident = self.ident;
                 let filter = self.filter;
                 let flags = self.flags;
@@ -1528,7 +1528,7 @@ cfg_if! {
         }
         impl Eq for semid_ds {}
         impl ::fmt::Debug for semid_ds {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let sem_perm = self.sem_perm;
                 let sem_base = self.sem_base;
                 let sem_nsems = self.sem_nsems;
@@ -1587,7 +1587,7 @@ cfg_if! {
         }
         impl Eq for shmid_ds {}
         impl ::fmt::Debug for shmid_ds {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let shm_perm = self.shm_perm;
                 let shm_segsz = self.shm_segsz;
                 let shm_lpid = self.shm_lpid;
@@ -1653,7 +1653,7 @@ cfg_if! {
         }
         impl Eq for proc_threadinfo {}
         impl ::fmt::Debug for proc_threadinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("proc_threadinfo")
                     .field("pth_user_time", &self.pth_user_time)
                     .field("pth_system_time", &self.pth_system_time)
@@ -1716,7 +1716,7 @@ cfg_if! {
 
         impl Eq for statfs {}
         impl ::fmt::Debug for statfs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("statfs")
                     .field("f_bsize", &self.f_bsize)
                     .field("f_iosize", &self.f_iosize)
@@ -1775,7 +1775,7 @@ cfg_if! {
         }
         impl Eq for dirent {}
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_ino", &self.d_ino)
                     .field("d_seekoff", &self.d_seekoff)
@@ -1808,7 +1808,7 @@ cfg_if! {
         }
         impl Eq for pthread_rwlock_t {}
         impl ::fmt::Debug for pthread_rwlock_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_rwlock_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1836,7 +1836,7 @@ cfg_if! {
         impl Eq for pthread_mutex_t {}
 
         impl ::fmt::Debug for pthread_mutex_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_mutex_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1865,7 +1865,7 @@ cfg_if! {
         impl Eq for pthread_cond_t {}
 
         impl ::fmt::Debug for pthread_cond_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_cond_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1901,7 +1901,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -1945,7 +1945,7 @@ cfg_if! {
         impl Eq for utmpx {}
 
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     // FIXME: .field("ut_user", &self.ut_user)
                     .field("ut_id", &self.ut_id)
@@ -1985,7 +1985,7 @@ cfg_if! {
         impl Eq for sigevent {}
 
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -2012,7 +2012,7 @@ cfg_if! {
         }
         impl Eq for processor_cpu_load_info {}
         impl ::fmt::Debug for processor_cpu_load_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_cpu_load_info")
                     .field("cpu_ticks", &self.cpu_ticks)
                     .finish()
@@ -2035,7 +2035,7 @@ cfg_if! {
         }
         impl Eq for processor_basic_info {}
         impl ::fmt::Debug for processor_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_basic_info")
                     .field("cpu_type", &self.cpu_type)
                     .field("cpu_subtype", &self.cpu_subtype)
@@ -2063,7 +2063,7 @@ cfg_if! {
         }
         impl Eq for processor_set_basic_info {}
         impl ::fmt::Debug for processor_set_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_set_basic_info")
                     .field("processor_count", &self.processor_count)
                     .field("default_policy", &self.default_policy)
@@ -2087,7 +2087,7 @@ cfg_if! {
         }
         impl Eq for processor_set_load_info {}
         impl ::fmt::Debug for processor_set_load_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_set_load_info")
                     .field("task_count", &self.task_count)
                     .field("thread_count", &self.thread_count)
@@ -2113,7 +2113,7 @@ cfg_if! {
         }
         impl Eq for time_value_t {}
         impl ::fmt::Debug for time_value_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("time_value_t")
                     .field("seconds", &self.seconds)
                     .field("microseconds", &self.microseconds)
@@ -2140,7 +2140,7 @@ cfg_if! {
         }
         impl Eq for thread_basic_info {}
         impl ::fmt::Debug for thread_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("thread_basic_info")
                     .field("user_time", &self.user_time)
                     .field("system_time", &self.system_time)
@@ -2185,7 +2185,7 @@ cfg_if! {
         }
         impl Eq for thread_extended_info {}
         impl ::fmt::Debug for thread_extended_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("proc_threadinfo")
                     .field("pth_user_time", &self.pth_user_time)
                     .field("pth_system_time", &self.pth_system_time)
@@ -2225,7 +2225,7 @@ cfg_if! {
         }
         impl Eq for thread_identifier_info {}
         impl ::fmt::Debug for thread_identifier_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("thread_identifier_info")
                     .field("thread_id", &self.thread_id)
                     .field("thread_handle", &self.thread_handle)
@@ -2271,7 +2271,7 @@ cfg_if! {
         }
         impl Eq for if_data64 {}
         impl ::fmt::Debug for if_data64 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifi_type = self.ifi_type;
                 let ifi_typelen = self.ifi_typelen;
                 let ifi_physical = self.ifi_physical;
@@ -2397,7 +2397,7 @@ cfg_if! {
         }
         impl Eq for if_msghdr2 {}
         impl ::fmt::Debug for if_msghdr2 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifm_msglen = self.ifm_msglen;
                 let ifm_version = self.ifm_version;
                 let ifm_type = self.ifm_type;
@@ -2482,7 +2482,7 @@ cfg_if! {
         }
         impl Eq for vm_statistics64 {}
         impl ::fmt::Debug for vm_statistics64 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let free_count = self.free_count;
                 let active_count = self.active_count;
                 let inactive_count = self.inactive_count;
@@ -2603,7 +2603,7 @@ cfg_if! {
         }
         impl Eq for mach_task_basic_info {}
         impl ::fmt::Debug for mach_task_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let virtual_size = self.virtual_size;
                 let resident_size = self.resident_size;
                 let resident_size_max = self.resident_size_max;
@@ -2650,7 +2650,7 @@ cfg_if! {
         }
         impl Eq for log2phys {}
         impl ::fmt::Debug for log2phys {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let l2p_flags = self.l2p_flags;
                 let l2p_contigbytes = self.l2p_contigbytes;
                 let l2p_devoffset = self.l2p_devoffset;
@@ -2680,7 +2680,7 @@ cfg_if! {
         impl Eq for os_unfair_lock {}
 
         impl ::fmt::Debug for os_unfair_lock {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("os_unfair_lock")
                     .field("_os_unfair_lock_opaque", &self._os_unfair_lock_opaque)
                     .finish()
@@ -2706,7 +2706,7 @@ cfg_if! {
         impl Eq for sockaddr_vm {}
 
         impl ::fmt::Debug for sockaddr_vm {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let svm_len = self.svm_len;
                 let svm_family = self.svm_family;
                 let svm_reserved1 = self.svm_reserved1;

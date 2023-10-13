@@ -78,7 +78,7 @@ cfg_if! {
         }
         impl Eq for fxsave64 {}
         impl ::fmt::Debug for fxsave64 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fxsave64")
                     .field("fx_fcw", &{self.fx_fcw})
                     .field("fx_fsw", &{self.fx_fsw})

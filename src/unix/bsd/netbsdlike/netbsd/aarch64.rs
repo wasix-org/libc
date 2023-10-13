@@ -59,7 +59,7 @@ cfg_if! {
         impl Eq for __c_anonymous__freg {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous__freg {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                 f.debug_struct("__c_anonymous__freg")
                     .field("__b8", &self.__b8)

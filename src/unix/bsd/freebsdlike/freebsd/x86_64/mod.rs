@@ -127,7 +127,7 @@ cfg_if! {
         }
         impl Eq for fpreg32 {}
         impl ::fmt::Debug for fpreg32 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpreg32")
                     .field("fpr_env", &&self.fpr_env[..])
                     .field("fpr_acc", &self.fpr_acc)
@@ -155,7 +155,7 @@ cfg_if! {
         }
         impl Eq for fpreg {}
         impl ::fmt::Debug for fpreg {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpreg")
                     .field("fpr_env", &self.fpr_env)
                     .field("fpr_acc", &self.fpr_acc)
@@ -186,7 +186,7 @@ cfg_if! {
         }
         impl Eq for xmmreg {}
         impl ::fmt::Debug for xmmreg {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("xmmreg")
                     .field("xmm_env", &self.xmm_env)
                     .field("xmm_acc", &self.xmm_acc)
@@ -216,7 +216,7 @@ cfg_if! {
         impl Eq for __c_anonymous_elf64_auxv_union {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_elf64_auxv_union {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("a_val")
                     .field("a_val", unsafe { &self.a_val })
                     .finish()
@@ -238,7 +238,7 @@ cfg_if! {
         impl Eq for Elf64_Auxinfo {}
         #[cfg(not(libc_union))]
         impl ::fmt::Debug for Elf64_Auxinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("Elf64_Auxinfo")
                     .field("a_type", &self.a_type)
                     .finish()
@@ -246,7 +246,7 @@ cfg_if! {
         }
         #[cfg(libc_union)]
         impl ::fmt::Debug for Elf64_Auxinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("Elf64_Auxinfo")
                     .field("a_type", &self.a_type)
                     .field("a_un", &self.a_un)
@@ -272,7 +272,7 @@ cfg_if! {
         }
         impl Eq for kinfo_file {}
         impl ::fmt::Debug for kinfo_file {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("kinfo_file")
                     .field("kf_structsize", &self.kf_structsize)
                     .field("kf_type", &self.kf_type)
