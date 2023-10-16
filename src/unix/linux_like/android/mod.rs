@@ -1224,6 +1224,9 @@ pub const PTHREAD_MUTEX_RECURSIVE: ::c_int = 1;
 pub const PTHREAD_MUTEX_ERRORCHECK: ::c_int = 2;
 pub const PTHREAD_MUTEX_DEFAULT: ::c_int = PTHREAD_MUTEX_NORMAL;
 
+pub const PTHREAD_EXPLICIT_SCHED: ::c_int = 0;
+pub const PTHREAD_INHERIT_SCHED: ::c_int = 1;
+
 // stdio.h
 pub const RENAME_NOREPLACE: ::c_int = 1;
 pub const RENAME_EXCHANGE: ::c_int = 2;
@@ -1559,6 +1562,7 @@ pub const RLIMIT_MSGQUEUE: ::c_int = 12;
 pub const RLIMIT_NICE: ::c_int = 13;
 pub const RLIMIT_RTPRIO: ::c_int = 14;
 
+#[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
 pub const RLIM_NLIMITS: ::c_int = 16;
 pub const RLIM_INFINITY: ::rlim_t = !0;
 
@@ -1703,6 +1707,7 @@ pub const REG_BACKR: ::c_int = 1024;
 
 pub const MCL_CURRENT: ::c_int = 0x0001;
 pub const MCL_FUTURE: ::c_int = 0x0002;
+pub const MCL_ONFAULT: ::c_int = 0x0004;
 
 pub const CBAUD: ::tcflag_t = 0o0010017;
 pub const TAB1: ::tcflag_t = 0x00000800;
@@ -3494,6 +3499,12 @@ extern "C" {
         attr: *const ::pthread_attr_t,
         guardsize: *mut ::size_t,
     ) -> ::c_int;
+    pub fn pthread_attr_setguardsize(attr: *mut ::pthread_attr_t, guardsize: ::size_t) -> ::c_int;
+    pub fn pthread_attr_getinheritsched(
+        attr: *const ::pthread_attr_t,
+        flag: *mut ::c_int,
+    ) -> ::c_int;
+    pub fn pthread_attr_setinheritsched(attr: *mut ::pthread_attr_t, flag: ::c_int) -> ::c_int;
     pub fn sethostname(name: *const ::c_char, len: ::size_t) -> ::c_int;
     pub fn sched_get_priority_min(policy: ::c_int) -> ::c_int;
     pub fn pthread_condattr_getpshared(
