@@ -1005,8 +1005,11 @@ extern "C" {
         _external_handler: ::Option<unsafe extern "C" fn(::c_int)>,
     ) -> ::c_int;
 
-    #[cfg(feature = "export-wasm-signal")]
-    fn __wasm_signal(signum: ::c_int);
+    cfg_if! {
+        if #[cfg(feature = "export-wasm-signal")] {
+            fn __wasm_signal(signum: ::c_int);
+        }
+    }
 }
 
 pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
@@ -1021,11 +1024,14 @@ extern "C" fn default_handler(sig: ::c_int) {
     }
 }
 
-#[cfg(feature = "export-wasm-signal")]
-mod wasm_signal {
-    #[no_mangle]
-    extern "C" fn __wasm_signal(signum: ::c_int) {
-        unsafe { super::__wasm_signal(signum) };
+cfg_if! {
+    if #[cfg(feature = "export-wasm-signal")] {
+        mod wasm_signal {
+            #[no_mangle]
+            extern "C" fn __wasm_signal(signum: ::c_int) {
+                unsafe { super::__wasm_signal(signum) };
+            }
+        }
     }
 }
 
