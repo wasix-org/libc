@@ -533,6 +533,14 @@ s! {
         pub key: *mut ::c_char,
         pub data: *mut ::c_void,
     }
+
+    pub struct ifreq {
+        pub ifr_name: [::c_char; ::IFNAMSIZ],
+        #[cfg(libc_union)]
+        pub ifr_ifru: __c_anonymous_ifr_ifru,
+        #[cfg(not(libc_union))]
+        pub ifr_ifru: ::sockaddr,
+    }
 }
 
 impl siginfo_t {
@@ -608,6 +616,18 @@ s_no_extra_traits! {
         align: [::c_char; 160],
     }
 
+    #[cfg(libc_union)]
+    pub union __c_anonymous_ifr_ifru {
+        pub ifru_addr: ::sockaddr,
+        pub ifru_dstaddr: ::sockaddr,
+        pub ifru_broadaddr: ::sockaddr,
+        pub ifru_flags: ::c_short,
+        pub ifru_metric: ::c_int,
+        pub ifru_vnetid: i64,
+        pub ifru_media: u64,
+        pub ifru_data: *mut ::c_char,
+        pub ifru_index: ::c_uint,
+    }
 }
 
 cfg_if! {
@@ -630,7 +650,7 @@ cfg_if! {
         impl Eq for dirent {}
 
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_fileno", &self.d_fileno)
                     .field("d_off", &self.d_off)
@@ -663,7 +683,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -690,7 +710,7 @@ cfg_if! {
         impl Eq for siginfo_t {}
 
         impl ::fmt::Debug for siginfo_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("siginfo_t")
                     .field("si_signo", &self.si_signo)
                     .field("si_code", &self.si_code)
@@ -728,7 +748,7 @@ cfg_if! {
         impl Eq for lastlog {}
 
         impl ::fmt::Debug for lastlog {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("lastlog")
                     .field("ll_time", &self.ll_time)
                 // FIXME: .field("ll_line", &self.ll_line)
@@ -769,7 +789,7 @@ cfg_if! {
         impl Eq for utmp {}
 
         impl ::fmt::Debug for utmp {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmp")
                 // FIXME: .field("ut_line", &self.ut_line)
                 // FIXME: .field("ut_name", &self.ut_name)
@@ -802,7 +822,7 @@ cfg_if! {
         impl Eq for mount_info { }
 
         impl ::fmt::Debug for mount_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mount_info")
                 // FIXME: .field("align", &self.align)
                     .finish()
@@ -812,6 +832,60 @@ cfg_if! {
         impl ::hash::Hash for mount_info {
             fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
                 unsafe { self.align.hash(state) };
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl PartialEq for __c_anonymous_ifr_ifru {
+            fn eq(&self, other: &__c_anonymous_ifr_ifru) -> bool {
+                unsafe {
+                    self.ifru_addr == other.ifru_addr
+                        && self.ifru_dstaddr == other.ifru_dstaddr
+                        && self.ifru_broadaddr == other.ifru_broadaddr
+                        && self.ifru_flags == other.ifru_flags
+                        && self.ifru_metric == other.ifru_metric
+                        && self.ifru_vnetid == other.ifru_vnetid
+                        && self.ifru_media == other.ifru_media
+                        && self.ifru_data == other.ifru_data
+                        && self.ifru_index == other.ifru_index
+                }
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl Eq for __c_anonymous_ifr_ifru {}
+
+        #[cfg(libc_union)]
+        impl ::fmt::Debug for __c_anonymous_ifr_ifru {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("__c_anonymous_ifr_ifru")
+                    .field("ifru_addr", unsafe { &self.ifru_addr })
+                    .field("ifru_dstaddr", unsafe { &self.ifru_dstaddr })
+                    .field("ifru_broadaddr", unsafe { &self.ifru_broadaddr })
+                    .field("ifru_flags", unsafe { &self.ifru_flags })
+                    .field("ifru_metric", unsafe { &self.ifru_metric })
+                    .field("ifru_vnetid", unsafe { &self.ifru_vnetid })
+                    .field("ifru_media", unsafe { &self.ifru_media })
+                    .field("ifru_data", unsafe { &self.ifru_data })
+                    .field("ifru_index", unsafe { &self.ifru_index })
+                    .finish()
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl ::hash::Hash for __c_anonymous_ifr_ifru {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                unsafe {
+                    self.ifru_addr.hash(state);
+                    self.ifru_dstaddr.hash(state);
+                    self.ifru_broadaddr.hash(state);
+                    self.ifru_flags.hash(state);
+                    self.ifru_metric.hash(state);
+                    self.ifru_vnetid.hash(state);
+                    self.ifru_media.hash(state);
+                    self.ifru_data.hash(state);
+                    self.ifru_index.hash(state);
+                }
             }
         }
     }
@@ -891,7 +965,7 @@ cfg_if! {
                 impl Eq for statfs { }
 
                 impl ::fmt::Debug for statfs {
-                    fn fmt(&self, f: &mut ::fmt::Formatter)
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>)
                            -> ::fmt::Result {
                         f.debug_struct("statfs")
                             .field("f_flags", &self.f_flags)
@@ -1779,11 +1853,6 @@ safe_f! {
 extern "C" {
     pub fn gettimeofday(tp: *mut ::timeval, tz: *mut ::timezone) -> ::c_int;
     pub fn settimeofday(tp: *const ::timeval, tz: *const ::timezone) -> ::c_int;
-    pub fn execvpe(
-        file: *const ::c_char,
-        argv: *const *const ::c_char,
-        envp: *const *const ::c_char,
-    ) -> ::c_int;
     pub fn pledge(promises: *const ::c_char, execpromises: *const ::c_char) -> ::c_int;
     pub fn unveil(path: *const ::c_char, permissions: *const ::c_char) -> ::c_int;
     pub fn strtonum(
@@ -1827,6 +1896,7 @@ extern "C" {
         attr: *const ::pthread_attr_t,
         guardsize: *mut ::size_t,
     ) -> ::c_int;
+    pub fn pthread_attr_setguardsize(attr: *mut ::pthread_attr_t, guardsize: ::size_t) -> ::c_int;
     pub fn pthread_attr_getstack(
         attr: *const ::pthread_attr_t,
         stackaddr: *mut *mut ::c_void,

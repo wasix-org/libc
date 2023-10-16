@@ -318,7 +318,7 @@ cfg_if! {
         }
         impl Eq for siginfo_t {}
         impl ::fmt::Debug for siginfo_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("siginfo_t");
                 struct_formatter.field("si_signo", &self.si_signo);
                 struct_formatter.field("si_errno", &self.si_errno);
@@ -363,7 +363,7 @@ cfg_if! {
         impl Eq for _kernel_simple_lock {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for _kernel_simple_lock {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("_kernel_simple_lock")
                     .field("_slock", unsafe { &self._slock })
                     .field("_slockp", unsafe { &self._slockp })
@@ -391,7 +391,7 @@ cfg_if! {
         }
         impl Eq for fileops_t {}
         impl ::fmt::Debug for fileops_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("fileops_t");
                 struct_formatter.field("fo_rw", &self.fo_rw);
                 struct_formatter.field("fo_ioctl", &self.fo_ioctl);
@@ -436,7 +436,7 @@ cfg_if! {
         }
         impl Eq for file {}
         impl ::fmt::Debug for file {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("file");
                 struct_formatter.field("f_flag", &self.f_flag);
                 struct_formatter.field("f_count", &self.f_count);
@@ -494,7 +494,7 @@ cfg_if! {
         impl Eq for __ld_info_file {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __ld_info_file {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__ld_info_file")
                     .field("_ldinfo_fd", unsafe { &self._ldinfo_fd })
                     .field("_ldinfo_fp", unsafe { &self._ldinfo_fp })
@@ -531,7 +531,7 @@ cfg_if! {
         }
         impl Eq for ld_info {}
         impl ::fmt::Debug for ld_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("ld_info");
                 struct_formatter.field("ldinfo_next", &self.ldinfo_next);
                 struct_formatter.field("ldinfo_flags", &self.ldinfo_flags);
@@ -573,7 +573,7 @@ cfg_if! {
         impl Eq for __pollfd_ext_u {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __pollfd_ext_u {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__pollfd_ext_u")
                     .field("addr", unsafe { &self.addr })
                     .field("data32", unsafe { &self.data32 })
@@ -606,7 +606,7 @@ cfg_if! {
         }
         impl Eq for pollfd_ext {}
         impl ::fmt::Debug for pollfd_ext {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("pollfd_ext");
                 struct_formatter.field("fd", &self.fd);
                 struct_formatter.field("events", &self.events);

@@ -3,6 +3,9 @@ use std::process::Command;
 use std::str;
 use std::string::String;
 
+mod rustc_version;
+mod rustc_version_parser;
+
 // List of cfgs this build script is allowed to set. The list is needed to support check-cfg, as we
 // need to know all the possible cfgs that this script will set. If you need to set another cfg
 // make sure to add it to this list as well.
@@ -33,7 +36,7 @@ const ALLOWED_CFGS: &'static [&'static str] = &[
 
 // Extra values to allow for check-cfg.
 const CHECK_CFG_EXTRA: &'static [(&'static str, &'static [&'static str])] = &[
-    ("target_os", &["switch", "aix", "ohos"]),
+    ("target_os", &["switch", "aix", "ohos", "hurd"]),
     ("target_env", &["illumos", "wasi", "aix", "ohos"]),
     (
         "target_arch",
@@ -42,6 +45,8 @@ const CHECK_CFG_EXTRA: &'static [(&'static str, &'static [&'static str])] = &[
 ];
 
 fn main() {
+    rustc_version::generate_rustc_version();
+
     // Avoid unnecessary re-building.
     println!("cargo:rerun-if-changed=build.rs");
 

@@ -58,7 +58,7 @@ cfg_if! {
         }
         impl Eq for gpregs {}
         impl ::fmt::Debug for gpregs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("gpregs")
                     .field("gp_x", &self.gp_x)
                     .field("gp_lr", &self.gp_lr)
@@ -90,7 +90,7 @@ cfg_if! {
         }
         impl Eq for fpregs {}
         impl ::fmt::Debug for fpregs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpregs")
                     .field("fp_q", &self.fp_q)
                     .field("fp_sr", &self.fp_sr)
@@ -120,7 +120,7 @@ cfg_if! {
         }
         impl Eq for mcontext_t {}
         impl ::fmt::Debug for mcontext_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mcontext_t")
                     .field("mc_gpregs", &self.mc_gpregs)
                     .field("mc_fpregs", &self.mc_fpregs)

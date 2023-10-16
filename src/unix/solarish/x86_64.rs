@@ -94,7 +94,7 @@ cfg_if! {
         impl Eq for __c_anonymous_fp_reg_set {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_fp_reg_set {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                 f.debug_struct("__c_anonymous_fp_reg_set")
                     .field("fpchip_state", &{self.fpchip_state})
@@ -110,7 +110,7 @@ cfg_if! {
         }
         impl Eq for fpregset_t {}
         impl ::fmt::Debug for fpregset_t {
-            fn fmt(&self, f:&mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f:&mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpregset_t")
                     .field("fp_reg_set", &self.fp_reg_set)
                     .finish()
@@ -124,7 +124,7 @@ cfg_if! {
         }
         impl Eq for mcontext_t {}
         impl ::fmt::Debug for mcontext_t {
-            fn fmt(&self, f:&mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f:&mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mcontext_t")
                     .field("gregs", &self.gregs)
                     .field("fpregs", &self.fpregs)
@@ -143,7 +143,7 @@ cfg_if! {
         }
         impl Eq for ucontext_t {}
         impl ::fmt::Debug for ucontext_t {
-            fn fmt(&self, f:&mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f:&mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ucontext_t")
                     .field("uc_flags", &self.uc_flags)
                     .field("uc_link", &self.uc_link)

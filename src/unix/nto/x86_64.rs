@@ -107,7 +107,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for x86_64_fpu_registers {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     f.debug_struct("x86_64_fpu_registers")
                         .field("fsave_area", &self.fsave_area)

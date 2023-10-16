@@ -156,7 +156,7 @@ cfg_if! {
         impl Eq for pthread_mutex_t {}
 
         impl ::fmt::Debug for pthread_mutex_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_mutex_t")
                     .field("value", &self.value)
                     // FIXME: .field("__reserved", &self.__reserved)
@@ -185,7 +185,7 @@ cfg_if! {
         impl Eq for pthread_cond_t {}
 
         impl ::fmt::Debug for pthread_cond_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_cond_t")
                     .field("value", &self.value)
                     // FIXME: .field("__reserved", &self.__reserved)
@@ -218,7 +218,7 @@ cfg_if! {
         impl Eq for pthread_rwlock_t {}
 
         impl ::fmt::Debug for pthread_rwlock_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_rwlock_t")
                     .field("numLocks", &self.numLocks)
                     .field("writerThreadId", &self.writerThreadId)
@@ -242,7 +242,7 @@ cfg_if! {
         }
 
         impl ::fmt::Debug for sigset64_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigset64_t")
                     .field("__bits", &self.__bits)
                     .finish()

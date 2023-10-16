@@ -172,7 +172,7 @@ cfg_if! {
         impl Eq for user_fpregs_struct {}
 
         impl ::fmt::Debug for user_fpregs_struct {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("user_fpregs_struct")
                     .field("cwd", &self.cwd)
                     .field("ftw", &self.ftw)
@@ -221,7 +221,7 @@ cfg_if! {
         impl Eq for ucontext_t {}
 
         impl ::fmt::Debug for ucontext_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ucontext_t")
                     .field("uc_flags", &self.uc_flags)
                     .field("uc_link", &self.uc_link)
@@ -831,6 +831,7 @@ pub const MAP_SYNC: ::c_int = 0x080000;
 
 pub const MCL_CURRENT: ::c_int = 0x0001;
 pub const MCL_FUTURE: ::c_int = 0x0002;
+pub const MCL_ONFAULT: ::c_int = 0x0004;
 pub const CBAUD: ::tcflag_t = 0o0010017;
 pub const TAB1: ::c_int = 0x00000800;
 pub const TAB2: ::c_int = 0x00001000;

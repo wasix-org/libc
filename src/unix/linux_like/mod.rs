@@ -271,7 +271,7 @@ cfg_if! {
         }
         impl Eq for epoll_event {}
         impl ::fmt::Debug for epoll_event {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let events = self.events;
                 let u64 = self.u64;
                 f.debug_struct("epoll_event")
@@ -301,7 +301,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_un {}
         impl ::fmt::Debug for sockaddr_un {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_un")
                     .field("sun_family", &self.sun_family)
                 // FIXME: .field("sun_path", &self.sun_path)
@@ -329,7 +329,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_family", &self.ss_family)
                     .field("__ss_align", &self.__ss_align)
@@ -382,7 +382,7 @@ cfg_if! {
         impl Eq for utsname {}
 
         impl ::fmt::Debug for utsname {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utsname")
                 // FIXME: .field("sysname", &self.sysname)
                 // FIXME: .field("nodename", &self.nodename)
@@ -416,7 +416,7 @@ cfg_if! {
         }
         impl Eq for sigevent {}
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_value", &self.sigev_value)
                     .field("sigev_signo", &self.sigev_signo)
@@ -1783,10 +1783,10 @@ extern "C" {
 
 // LFS64 extensions
 //
-// * musl has 64-bit versions only so aliases the LFS64 symbols to the standard ones
+// * musl and Emscripten has 64-bit versions only so aliases the LFS64 symbols to the standard ones
 // * ulibc doesn't have preadv64/pwritev64
 cfg_if! {
-    if #[cfg(not(target_env = "musl"))] {
+    if #[cfg(not(any(target_env = "musl", target_os = "emscripten")))] {
         extern "C" {
             pub fn fstatfs64(fd: ::c_int, buf: *mut statfs64) -> ::c_int;
             pub fn statvfs64(path: *const ::c_char, buf: *mut statvfs64) -> ::c_int;
@@ -1844,7 +1844,7 @@ cfg_if! {
 }
 
 cfg_if! {
-    if #[cfg(not(any(target_env = "uclibc", target_env = "musl")))] {
+    if #[cfg(not(any(target_env = "uclibc", target_env = "musl", target_os = "emscripten")))] {
         extern "C" {
             pub fn preadv64(
                 fd: ::c_int,

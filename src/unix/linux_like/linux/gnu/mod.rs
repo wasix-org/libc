@@ -524,7 +524,7 @@ cfg_if! {
         impl Eq for utmpx {}
 
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     .field("ut_type", &self.ut_type)
                     .field("ut_pid", &self.ut_pid)
@@ -573,7 +573,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ptrace_syscall_info_data {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                 f.debug_struct("__c_anonymous_ptrace_syscall_info_data")
                     .field("entry", &self.entry)
@@ -944,6 +944,9 @@ pub const NT_PRFPXREG: ::c_int = 20;
 
 pub const ELFOSABI_ARM_AEABI: u8 = 64;
 
+// linux/sched.h
+pub const CLONE_NEWTIME: ::c_int = 0x80;
+
 // linux/keyctl.h
 pub const KEYCTL_DH_COMPUTE: u32 = 23;
 pub const KEYCTL_PKEY_QUERY: u32 = 24;
@@ -1092,6 +1095,8 @@ pub const GLOB_NOMAGIC: ::c_int = 1 << 11;
 pub const GLOB_TILDE: ::c_int = 1 << 12;
 pub const GLOB_ONLYDIR: ::c_int = 1 << 13;
 pub const GLOB_TILDE_CHECK: ::c_int = 1 << 14;
+
+pub const MADV_COLLAPSE: ::c_int = 25;
 
 cfg_if! {
     if #[cfg(any(
@@ -1389,6 +1394,17 @@ extern "C" {
         buf: *mut ::c_char,
         buflen: ::c_int,
     ) -> *mut ::mntent;
+
+    pub fn execveat(
+        dirfd: ::c_int,
+        pathname: *const ::c_char,
+        argv: *const *mut c_char,
+        envp: *const *mut c_char,
+        flags: ::c_int,
+    ) -> ::c_int;
+
+    // Added in `glibc` 2.34
+    pub fn close_range(first: ::c_uint, last: ::c_uint, flags: ::c_int) -> ::c_int;
 }
 
 cfg_if! {

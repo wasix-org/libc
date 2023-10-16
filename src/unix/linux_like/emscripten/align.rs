@@ -57,7 +57,7 @@ macro_rules! expand_align {
                 }
                 impl Eq for pthread_cond_t {}
                 impl ::fmt::Debug for pthread_cond_t {
-                    fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                         f.debug_struct("pthread_cond_t")
                             // FIXME: .field("size", &self.size)
                             .finish()

@@ -967,6 +967,8 @@ s! {
         pub ifc_len: ::c_int,
         #[cfg(libc_union)]
         pub ifc_ifcu: __c_anonymous_ifc_ifcu,
+        #[cfg(not(libc_union))]
+        pub ifc_ifcu: *mut ifreq,
     }
 
     pub struct au_mask_t {
@@ -1637,7 +1639,7 @@ cfg_if! {
         }
         impl Eq for utmpx {}
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     .field("ut_type", &self.ut_type)
                     .field("ut_tv", &self.ut_tv)
@@ -1673,7 +1675,7 @@ cfg_if! {
         impl Eq for __c_anonymous_cr_pid {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_cr_pid {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("cr_pid")
                     .field("cr_pid", unsafe { &self.cr_pid })
                     .finish()
@@ -1703,7 +1705,7 @@ cfg_if! {
         }
         impl Eq for xucred {}
         impl ::fmt::Debug for xucred {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("xucred");
                 struct_formatter.field("cr_version", &self.cr_version);
                 struct_formatter.field("cr_uid", &self.cr_uid);
@@ -1748,7 +1750,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_dl {}
         impl ::fmt::Debug for sockaddr_dl {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_dl")
                     .field("sdl_len", &self.sdl_len)
                     .field("sdl_family", &self.sdl_family)
@@ -1784,7 +1786,7 @@ cfg_if! {
         }
         impl Eq for mq_attr {}
         impl ::fmt::Debug for mq_attr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("mq_attr")
                     .field("mq_flags", &self.mq_flags)
                     .field("mq_maxmsg", &self.mq_maxmsg)
@@ -1813,7 +1815,7 @@ cfg_if! {
         }
         impl Eq for sigevent {}
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -1842,7 +1844,7 @@ cfg_if! {
         }
         impl Eq for ptsstat {}
         impl ::fmt::Debug for ptsstat {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let self_devname: &[::c_char] = &self.devname;
 
                 f.debug_struct("ptsstat")
@@ -1870,7 +1872,7 @@ cfg_if! {
         impl Eq for __c_anonymous_elf32_auxv_union {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_elf32_auxv_union {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("a_val")
                     .field("a_val", unsafe { &self.a_val })
                     .finish()
@@ -1892,7 +1894,7 @@ cfg_if! {
         impl Eq for Elf32_Auxinfo {}
         #[cfg(not(libc_union))]
         impl ::fmt::Debug for Elf32_Auxinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("Elf32_Auxinfo")
                     .field("a_type", &self.a_type)
                     .finish()
@@ -1900,7 +1902,7 @@ cfg_if! {
         }
         #[cfg(libc_union)]
         impl ::fmt::Debug for Elf32_Auxinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("Elf32_Auxinfo")
                     .field("a_type", &self.a_type)
                     .field("a_un", &self.a_un)
@@ -1934,7 +1936,7 @@ cfg_if! {
         impl Eq for __c_anonymous_ifr_ifru {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifr_ifru {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ifr_ifru")
                     .field("ifru_addr", unsafe { &self.ifru_addr })
                     .field("ifru_dstaddr", unsafe { &self.ifru_dstaddr })
@@ -1982,7 +1984,7 @@ cfg_if! {
         }
         impl Eq for ifreq {}
         impl ::fmt::Debug for ifreq {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ifreq")
                     .field("ifr_name", &self.ifr_name)
                     .field("ifr_ifru", &self.ifr_ifru)
@@ -2011,7 +2013,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifc_ifcu {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ifc_ifcu")
                     .field("ifcu_buf", unsafe { &self.ifcu_buf })
                     .field("ifcu_req", unsafe { &self.ifcu_req })
@@ -2037,7 +2039,7 @@ cfg_if! {
         }
         impl Eq for ifstat {}
         impl ::fmt::Debug for ifstat {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ascii: &[::c_char] = &self.ascii;
 
                 f.debug_struct("ifstat")
@@ -2067,7 +2069,7 @@ cfg_if! {
         }
         impl Eq for ifrsskey {}
         impl ::fmt::Debug for ifrsskey {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifrk_key: &[u8] = &self.ifrk_key;
 
                 f.debug_struct("ifrsskey")
@@ -2102,7 +2104,7 @@ cfg_if! {
         }
         impl Eq for ifdownreason {}
         impl ::fmt::Debug for ifdownreason {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifdr_msg: &[::c_char] = &self.ifdr_msg;
 
                 f.debug_struct("ifdownreason")
@@ -2135,7 +2137,7 @@ cfg_if! {
         impl Eq for __c_anonymous_ifi_epoch {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifi_epoch {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__c_anonymous_ifi_epoch")
                     .field("tt", unsafe { &self.tt })
                     .field("ph", unsafe { &self.ph })
@@ -2165,7 +2167,7 @@ cfg_if! {
         impl Eq for __c_anonymous_ifi_lastchange {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifi_lastchange {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__c_anonymous_ifi_lastchange")
                     .field("tv", unsafe { &self.tv })
                     .field("ph", unsafe { &self.ph })
@@ -2213,7 +2215,7 @@ cfg_if! {
         }
         impl Eq for if_data {}
         impl ::fmt::Debug for if_data {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("if_data")
                     .field("ifi_type", &self.ifi_type)
                     .field("ifi_physical", &self.ifi_physical)
@@ -2283,7 +2285,7 @@ cfg_if! {
         }
         impl Eq for sctphdr {}
         impl ::fmt::Debug for sctphdr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctphdr")
                     .field("src_port", &{self.src_port})
                     .field("dest_port", &{self.dest_port})
@@ -2310,7 +2312,7 @@ cfg_if! {
         }
         impl Eq for sctp_chunkhdr {}
         impl ::fmt::Debug for sctp_chunkhdr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_chunkhdr")
                     .field("chunk_type", &{self.chunk_type})
                     .field("chunk_flags", &{self.chunk_flags})
@@ -2334,7 +2336,7 @@ cfg_if! {
         }
         impl Eq for sctp_paramhdr {}
         impl ::fmt::Debug for sctp_paramhdr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_paramhdr")
                     .field("param_type", &{self.param_type})
                     .field("param_length", &{self.param_length})
@@ -2357,7 +2359,7 @@ cfg_if! {
         }
         impl Eq for sctp_gen_error_cause {}
         impl ::fmt::Debug for sctp_gen_error_cause {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_gen_error_cause")
                     .field("code", &{self.code})
                     .field("length", &{self.length})
@@ -2381,7 +2383,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_cause {}
         impl ::fmt::Debug for sctp_error_cause {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_cause")
                     .field("code", &{self.code})
                     .field("length", &{self.length})
@@ -2403,7 +2405,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_invalid_stream {}
         impl ::fmt::Debug for sctp_error_invalid_stream {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_invalid_stream")
                     .field("cause", &{self.cause})
                     .field("stream_id", &{self.stream_id})
@@ -2426,7 +2428,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_missing_param {}
         impl ::fmt::Debug for sctp_error_missing_param {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_missing_param")
                     .field("cause", &{self.cause})
                     .field("num_missing_params", &{self.num_missing_params})
@@ -2450,7 +2452,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_stale_cookie {}
         impl ::fmt::Debug for sctp_error_stale_cookie {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_stale_cookie")
                     .field("cause", &{self.cause})
                     .field("stale_time", &{self.stale_time})
@@ -2471,7 +2473,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_out_of_resource {}
         impl ::fmt::Debug for sctp_error_out_of_resource {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_out_of_resource")
                     .field("cause", &{self.cause})
                     .finish()
@@ -2490,7 +2492,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_unresolv_addr {}
         impl ::fmt::Debug for sctp_error_unresolv_addr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_unresolv_addr")
                     .field("cause", &{self.cause})
                     .finish()
@@ -2510,7 +2512,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_unrecognized_chunk {}
         impl ::fmt::Debug for sctp_error_unrecognized_chunk {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_unrecognized_chunk")
                     .field("cause", &{self.cause})
                     .field("ch", &{self.ch})
@@ -2532,7 +2534,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_no_user_data {}
         impl ::fmt::Debug for sctp_error_no_user_data {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_no_user_data")
                     .field("cause", &{self.cause})
                     .field("tsn", &{self.tsn})
@@ -2554,7 +2556,7 @@ cfg_if! {
         }
         impl Eq for sctp_error_auth_invalid_hmac {}
         impl ::fmt::Debug for sctp_error_auth_invalid_hmac {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sctp_error_invalid_hmac")
                     .field("cause", &{self.cause})
                     .field("hmac_id", &{self.hmac_id})
@@ -2664,7 +2666,9 @@ pub const Q_SETQUOTA: ::c_int = 0x800;
 pub const MAP_GUARD: ::c_int = 0x00002000;
 pub const MAP_EXCL: ::c_int = 0x00004000;
 pub const MAP_PREFAULT_READ: ::c_int = 0x00040000;
-pub const MAP_ALIGNED_SUPER: ::c_int = 1 << 24;
+pub const MAP_ALIGNMENT_SHIFT: ::c_int = 24;
+pub const MAP_ALIGNMENT_MASK: ::c_int = 0xff << MAP_ALIGNMENT_SHIFT;
+pub const MAP_ALIGNED_SUPER: ::c_int = 1 << MAP_ALIGNMENT_SHIFT;
 
 pub const POSIX_FADV_NORMAL: ::c_int = 0;
 pub const POSIX_FADV_RANDOM: ::c_int = 1;
@@ -4693,6 +4697,11 @@ pub const RB_POWERCYCLE: ::c_int = 0x400000;
 pub const RB_PROBE: ::c_int = 0x10000000;
 pub const RB_MULTIPLE: ::c_int = 0x20000000;
 
+// sys/timerfd.h
+
+pub const TFD_NONBLOCK: ::c_int = ::O_NONBLOCK;
+pub const TFD_CLOEXEC: ::c_int = O_CLOEXEC;
+
 cfg_if! {
     if #[cfg(libc_const_extern_fn)] {
         pub const fn MAP_ALIGNED(a: ::c_int) -> ::c_int {
@@ -5406,6 +5415,17 @@ extern "C" {
         infotype: *mut ::c_uint,
         flags: *mut ::c_int,
     ) -> ::ssize_t;
+
+    pub fn timerfd_create(clockid: ::c_int, flags: ::c_int) -> ::c_int;
+    pub fn timerfd_gettime(fd: ::c_int, curr_value: *mut itimerspec) -> ::c_int;
+    pub fn timerfd_settime(
+        fd: ::c_int,
+        flags: ::c_int,
+        new_value: *const itimerspec,
+        old_value: *mut itimerspec,
+    ) -> ::c_int;
+    pub fn closefrom(lowfd: ::c_int);
+    pub fn close_range(lowfd: ::c_uint, highfd: ::c_uint, flags: ::c_int) -> ::c_int;
 }
 
 #[link(name = "memstat")]

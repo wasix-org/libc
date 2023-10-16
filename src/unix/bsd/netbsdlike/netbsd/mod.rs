@@ -10,7 +10,7 @@ type __pthread_spin_t = __cpu_simple_lock_nv_t;
 pub type vm_size_t = ::uintptr_t; // FIXME: deprecated since long time
 pub type lwpid_t = ::c_uint;
 pub type shmatt_t = ::c_uint;
-pub type cpuid_t = u64;
+pub type cpuid_t = ::c_ulong;
 pub type cpuset_t = _cpuset;
 pub type pthread_spin_t = ::c_uchar;
 pub type timer_t = ::c_int;
@@ -907,7 +907,7 @@ cfg_if! {
         impl Eq for utmpx {}
 
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     .field("ut_name", &self.ut_name)
                     .field("ut_id", &self.ut_id)
@@ -956,7 +956,7 @@ cfg_if! {
         impl Eq for lastlogx {}
 
         impl ::fmt::Debug for lastlogx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("lastlogx")
                     .field("ll_tv", &self.ll_tv)
                     .field("ll_line", &self.ll_line)
@@ -983,7 +983,7 @@ cfg_if! {
         }
         impl Eq for in_pktinfo {}
         impl ::fmt::Debug for in_pktinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("in_pktinfo")
                     .field("ipi_addr", &self.ipi_addr)
                     .field("ipi_ifindex", &self.ipi_ifindex)
@@ -1008,7 +1008,7 @@ cfg_if! {
         }
         impl Eq for arphdr {}
         impl ::fmt::Debug for arphdr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ar_hrd = self.ar_hrd;
                 let ar_pro = self.ar_pro;
                 let ar_op = self.ar_op;
@@ -1041,7 +1041,7 @@ cfg_if! {
         }
         impl Eq for in_addr {}
         impl ::fmt::Debug for in_addr {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let s_addr = self.s_addr;
                 f.debug_struct("in_addr")
                     .field("s_addr", &s_addr)
@@ -1063,7 +1063,7 @@ cfg_if! {
         }
         impl Eq for ip_mreq {}
         impl ::fmt::Debug for ip_mreq {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("ip_mreq")
                     .field("imr_multiaddr", &self.imr_multiaddr)
                     .field("imr_interface", &self.imr_interface)
@@ -1088,7 +1088,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_in {}
         impl ::fmt::Debug for sockaddr_in {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_in")
                     .field("sin_len", &self.sin_len)
                     .field("sin_family", &self.sin_family)
@@ -1123,7 +1123,7 @@ cfg_if! {
         }
         impl Eq for dirent {}
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_fileno", &self.d_fileno)
                     .field("d_reclen", &self.d_reclen)
@@ -1181,7 +1181,7 @@ cfg_if! {
         }
         impl Eq for statvfs {}
         impl ::fmt::Debug for statvfs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("statvfs")
                     .field("f_flag", &self.f_flag)
                     .field("f_bsize", &self.f_bsize)
@@ -1254,7 +1254,7 @@ cfg_if! {
         }
         impl Eq for sockaddr_storage {}
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -1285,7 +1285,7 @@ cfg_if! {
         }
         impl Eq for sigevent {}
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -1319,7 +1319,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_posix_spawn_fae {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     f.debug_struct("__c_anonymous_posix_fae")
                         .field("open", &self.open)
@@ -1354,7 +1354,7 @@ cfg_if! {
 
         #[cfg(libc_union)]
         impl ::fmt::Debug for __c_anonymous_ifc_ifcu {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 unsafe {
                     f.debug_struct("__c_anonymous_ifc_ifcu")
                         .field("ifcu_buf", &self.ifcu_buf)
@@ -1527,6 +1527,7 @@ pub const SOCK_FLAGS_MASK: ::c_int = 0xf0000000;
 
 pub const SO_SNDTIMEO: ::c_int = 0x100b;
 pub const SO_RCVTIMEO: ::c_int = 0x100c;
+pub const SO_NOSIGPIPE: ::c_int = 0x0800;
 pub const SO_ACCEPTFILTER: ::c_int = 0x1000;
 pub const SO_TIMESTAMP: ::c_int = 0x2000;
 pub const SO_OVERFLOWED: ::c_int = 0x1009;
@@ -1852,6 +1853,9 @@ pub const MNT_NODEVMTIME: ::c_int = 0x40000000;
 pub const MNT_SOFTDEP: ::c_int = 0x80000000;
 pub const MNT_POSIX1EACLS: ::c_int = 0x00000800;
 pub const MNT_ACLS: ::c_int = MNT_POSIX1EACLS;
+pub const MNT_WAIT: ::c_int = 1;
+pub const MNT_NOWAIT: ::c_int = 2;
+pub const MNT_LAZY: ::c_int = 3;
 
 //<sys/timex.h>
 pub const NTP_API: ::c_int = 4;
@@ -2529,12 +2533,6 @@ extern "C" {
     pub fn fchflags(fd: ::c_int, flags: ::c_ulong) -> ::c_int;
     pub fn lchflags(path: *const ::c_char, flags: ::c_ulong) -> ::c_int;
 
-    pub fn execvpe(
-        file: *const ::c_char,
-        argv: *const *const ::c_char,
-        envp: *const *const ::c_char,
-    ) -> ::c_int;
-
     pub fn extattr_list_fd(
         fd: ::c_int,
         attrnamespace: ::c_int,
@@ -2727,6 +2725,7 @@ extern "C" {
         attr: *const ::pthread_attr_t,
         guardsize: *mut ::size_t,
     ) -> ::c_int;
+    pub fn pthread_attr_setguardsize(attr: *mut ::pthread_attr_t, guardsize: ::size_t) -> ::c_int;
     pub fn pthread_attr_getstack(
         attr: *const ::pthread_attr_t,
         stackaddr: *mut *mut ::c_void,
@@ -3151,6 +3150,38 @@ extern "C" {
     pub fn flags_to_string(flags: ::c_ulong, def: *const ::c_char) -> ::c_int;
 
     pub fn kinfo_getvmmap(pid: ::pid_t, cntp: *mut ::size_t) -> *mut kinfo_vmentry;
+}
+
+#[link(name = "execinfo")]
+extern "C" {
+    pub fn backtrace(addrlist: *mut *mut ::c_void, len: ::size_t) -> ::size_t;
+    pub fn backtrace_symbols(addrlist: *const *mut ::c_void, len: ::size_t) -> *mut *mut ::c_char;
+    pub fn backtrace_symbols_fd(
+        addrlist: *const *mut ::c_void,
+        len: ::size_t,
+        fd: ::c_int,
+    ) -> ::c_int;
+    pub fn backtrace_symbols_fmt(
+        addrlist: *const *mut ::c_void,
+        len: ::size_t,
+        fmt: *const ::c_char,
+    ) -> *mut *mut ::c_char;
+    pub fn backtrace_symbols_fd_fmt(
+        addrlist: *const *mut ::c_void,
+        len: ::size_t,
+        fd: ::c_int,
+        fmt: *const ::c_char,
+    ) -> ::c_int;
+}
+
+cfg_if! {
+    if #[cfg(libc_union)] {
+        extern {
+            // these functions use statvfs:
+            pub fn getmntinfo(mntbufp: *mut *mut ::statvfs, flags: ::c_int) -> ::c_int;
+            pub fn getvfsstat(buf: *mut statvfs, bufsize: ::size_t, flags: ::c_int) -> ::c_int;
+        }
+    }
 }
 
 cfg_if! {

@@ -145,6 +145,16 @@ pub type CCRNGStatus = ::CCCryptorStatus;
 
 pub type copyfile_state_t = *mut ::c_void;
 pub type copyfile_flags_t = u32;
+pub type copyfile_callback_t = ::Option<
+    extern "C" fn(
+        ::c_int,
+        ::c_int,
+        copyfile_state_t,
+        *const ::c_char,
+        *const ::c_char,
+        *mut ::c_void,
+    ) -> ::c_int,
+>;
 
 pub type attrgroup_t = u32;
 pub type vol_capabilities_set_t = [u32; 4];
@@ -366,6 +376,25 @@ s! {
         pub fst_offset: ::off_t,
         pub fst_length: ::off_t,
         pub fst_bytesalloc: ::off_t,
+    }
+
+    pub struct fpunchhole_t {
+        pub fp_flags: ::c_uint, /* unused */
+        pub reserved: ::c_uint, /* (to maintain 8-byte alignment) */
+        pub fp_offset: ::off_t, /* IN: start of the region */
+        pub fp_length: ::off_t, /* IN: size of the region */
+    }
+
+    pub struct ftrimactivefile_t {
+        pub fta_offset: ::off_t,
+        pub fta_length: ::off_t,
+    }
+
+    pub struct fspecread_t {
+        pub fsr_flags: ::c_uint,
+        pub reserved: ::c_uint,
+        pub fsr_offset: ::off_t,
+        pub fsr_length: ::off_t,
     }
 
     pub struct radvisory {
@@ -768,7 +797,7 @@ s! {
     pub struct sockaddr_ndrv {
         pub snd_len: ::c_uchar,
         pub snd_family: ::c_uchar,
-        pub snd_name: [::c_uchar; 16]      // IFNAMSIZ from if.h
+        pub snd_name: [::c_uchar; ::IFNAMSIZ],
     }
 
     // sys/socket.h
@@ -1100,6 +1129,15 @@ s! {
         pub validattr: attribute_set_t,
         pub nativeattr: attribute_set_t,
     }
+
+    #[cfg_attr(libc_packedN, repr(packed(4)))]
+    pub struct ifconf {
+        pub ifc_len: ::c_int,
+        #[cfg(libc_union)]
+        pub ifc_ifcu: __c_anonymous_ifc_ifcu,
+        #[cfg(not(libc_union))]
+        pub ifc_ifcu: *mut ifreq,
+    }
 }
 
 s_no_extra_traits! {
@@ -1390,6 +1428,60 @@ s_no_extra_traits! {
         pub svm_port: ::c_uint,
         pub svm_cid: ::c_uint,
     }
+
+    pub struct ifdevmtu {
+        pub ifdm_current: ::c_int,
+        pub ifdm_min: ::c_int,
+        pub ifdm_max: ::c_int,
+    }
+
+    #[cfg(libc_union)]
+    pub union __c_anonymous_ifk_data {
+        pub ifk_ptr: *mut ::c_void,
+        pub ifk_value: ::c_int,
+    }
+
+    #[cfg_attr(libc_packedN, repr(packed(4)))]
+    pub struct ifkpi {
+        pub ifk_module_id: ::c_uint,
+        pub ifk_type: ::c_uint,
+        #[cfg(libc_union)]
+        pub ifk_data: __c_anonymous_ifk_data,
+    }
+
+    #[cfg(libc_union)]
+    pub union __c_anonymous_ifr_ifru {
+        pub ifru_addr: ::sockaddr,
+        pub ifru_dstaddr: ::sockaddr,
+        pub ifru_broadaddr: ::sockaddr,
+        pub ifru_flags: ::c_short,
+        pub ifru_metrics: ::c_int,
+        pub ifru_mtu: ::c_int,
+        pub ifru_phys: ::c_int,
+        pub ifru_media: ::c_int,
+        pub ifru_intval: ::c_int,
+        pub ifru_data: *mut ::c_char,
+        pub ifru_devmtu: ifdevmtu,
+        pub ifru_kpi: ifkpi,
+        pub ifru_wake_flags: u32,
+        pub ifru_route_refcnt: u32,
+        pub ifru_cap: [::c_int; 2],
+        pub ifru_functional_type: u32,
+    }
+
+    pub struct ifreq {
+        pub ifr_name: [::c_char; ::IFNAMSIZ],
+        #[cfg(libc_union)]
+        pub ifr_ifru: __c_anonymous_ifr_ifru,
+        #[cfg(not(libc_union))]
+        pub ifr_ifru: ::sockaddr,
+    }
+
+    #[cfg(libc_union)]
+    pub union __c_anonymous_ifc_ifcu {
+        pub ifcu_buf: *mut ::c_char,
+        pub ifcu_req: *mut ifreq,
+    }
 }
 
 impl siginfo_t {
@@ -1445,7 +1537,7 @@ cfg_if! {
                 }
                 impl Eq for semun {}
                 impl ::fmt::Debug for semun {
-                    fn fmt(&self, f: &mut ::fmt::Formatter)
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>)
                            -> ::fmt::Result {
                         f.debug_struct("semun")
                             .field("val", unsafe { &self.val })
@@ -1476,7 +1568,7 @@ cfg_if! {
         }
         impl Eq for kevent {}
         impl ::fmt::Debug for kevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ident = self.ident;
                 let filter = self.filter;
                 let flags = self.flags;
@@ -1528,7 +1620,7 @@ cfg_if! {
         }
         impl Eq for semid_ds {}
         impl ::fmt::Debug for semid_ds {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let sem_perm = self.sem_perm;
                 let sem_base = self.sem_base;
                 let sem_nsems = self.sem_nsems;
@@ -1587,7 +1679,7 @@ cfg_if! {
         }
         impl Eq for shmid_ds {}
         impl ::fmt::Debug for shmid_ds {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let shm_perm = self.shm_perm;
                 let shm_segsz = self.shm_segsz;
                 let shm_lpid = self.shm_lpid;
@@ -1653,7 +1745,7 @@ cfg_if! {
         }
         impl Eq for proc_threadinfo {}
         impl ::fmt::Debug for proc_threadinfo {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("proc_threadinfo")
                     .field("pth_user_time", &self.pth_user_time)
                     .field("pth_system_time", &self.pth_system_time)
@@ -1716,7 +1808,7 @@ cfg_if! {
 
         impl Eq for statfs {}
         impl ::fmt::Debug for statfs {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("statfs")
                     .field("f_bsize", &self.f_bsize)
                     .field("f_iosize", &self.f_iosize)
@@ -1775,7 +1867,7 @@ cfg_if! {
         }
         impl Eq for dirent {}
         impl ::fmt::Debug for dirent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("dirent")
                     .field("d_ino", &self.d_ino)
                     .field("d_seekoff", &self.d_seekoff)
@@ -1808,7 +1900,7 @@ cfg_if! {
         }
         impl Eq for pthread_rwlock_t {}
         impl ::fmt::Debug for pthread_rwlock_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_rwlock_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1836,7 +1928,7 @@ cfg_if! {
         impl Eq for pthread_mutex_t {}
 
         impl ::fmt::Debug for pthread_mutex_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_mutex_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1865,7 +1957,7 @@ cfg_if! {
         impl Eq for pthread_cond_t {}
 
         impl ::fmt::Debug for pthread_cond_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("pthread_cond_t")
                     .field("__sig", &self.__sig)
                     // FIXME: .field("__opaque", &self.__opaque)
@@ -1901,7 +1993,7 @@ cfg_if! {
         impl Eq for sockaddr_storage {}
 
         impl ::fmt::Debug for sockaddr_storage {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sockaddr_storage")
                     .field("ss_len", &self.ss_len)
                     .field("ss_family", &self.ss_family)
@@ -1945,7 +2037,7 @@ cfg_if! {
         impl Eq for utmpx {}
 
         impl ::fmt::Debug for utmpx {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("utmpx")
                     // FIXME: .field("ut_user", &self.ut_user)
                     .field("ut_id", &self.ut_id)
@@ -1985,7 +2077,7 @@ cfg_if! {
         impl Eq for sigevent {}
 
         impl ::fmt::Debug for sigevent {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("sigevent")
                     .field("sigev_notify", &self.sigev_notify)
                     .field("sigev_signo", &self.sigev_signo)
@@ -2012,7 +2104,7 @@ cfg_if! {
         }
         impl Eq for processor_cpu_load_info {}
         impl ::fmt::Debug for processor_cpu_load_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_cpu_load_info")
                     .field("cpu_ticks", &self.cpu_ticks)
                     .finish()
@@ -2035,7 +2127,7 @@ cfg_if! {
         }
         impl Eq for processor_basic_info {}
         impl ::fmt::Debug for processor_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_basic_info")
                     .field("cpu_type", &self.cpu_type)
                     .field("cpu_subtype", &self.cpu_subtype)
@@ -2063,7 +2155,7 @@ cfg_if! {
         }
         impl Eq for processor_set_basic_info {}
         impl ::fmt::Debug for processor_set_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_set_basic_info")
                     .field("processor_count", &self.processor_count)
                     .field("default_policy", &self.default_policy)
@@ -2087,7 +2179,7 @@ cfg_if! {
         }
         impl Eq for processor_set_load_info {}
         impl ::fmt::Debug for processor_set_load_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("processor_set_load_info")
                     .field("task_count", &self.task_count)
                     .field("thread_count", &self.thread_count)
@@ -2113,7 +2205,7 @@ cfg_if! {
         }
         impl Eq for time_value_t {}
         impl ::fmt::Debug for time_value_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("time_value_t")
                     .field("seconds", &self.seconds)
                     .field("microseconds", &self.microseconds)
@@ -2140,7 +2232,7 @@ cfg_if! {
         }
         impl Eq for thread_basic_info {}
         impl ::fmt::Debug for thread_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("thread_basic_info")
                     .field("user_time", &self.user_time)
                     .field("system_time", &self.system_time)
@@ -2185,7 +2277,7 @@ cfg_if! {
         }
         impl Eq for thread_extended_info {}
         impl ::fmt::Debug for thread_extended_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("proc_threadinfo")
                     .field("pth_user_time", &self.pth_user_time)
                     .field("pth_system_time", &self.pth_system_time)
@@ -2225,7 +2317,7 @@ cfg_if! {
         }
         impl Eq for thread_identifier_info {}
         impl ::fmt::Debug for thread_identifier_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("thread_identifier_info")
                     .field("thread_id", &self.thread_id)
                     .field("thread_handle", &self.thread_handle)
@@ -2271,7 +2363,7 @@ cfg_if! {
         }
         impl Eq for if_data64 {}
         impl ::fmt::Debug for if_data64 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifi_type = self.ifi_type;
                 let ifi_typelen = self.ifi_typelen;
                 let ifi_physical = self.ifi_physical;
@@ -2397,7 +2489,7 @@ cfg_if! {
         }
         impl Eq for if_msghdr2 {}
         impl ::fmt::Debug for if_msghdr2 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let ifm_msglen = self.ifm_msglen;
                 let ifm_version = self.ifm_version;
                 let ifm_type = self.ifm_type;
@@ -2482,7 +2574,7 @@ cfg_if! {
         }
         impl Eq for vm_statistics64 {}
         impl ::fmt::Debug for vm_statistics64 {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let free_count = self.free_count;
                 let active_count = self.active_count;
                 let inactive_count = self.inactive_count;
@@ -2603,7 +2695,7 @@ cfg_if! {
         }
         impl Eq for mach_task_basic_info {}
         impl ::fmt::Debug for mach_task_basic_info {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let virtual_size = self.virtual_size;
                 let resident_size = self.resident_size;
                 let resident_size_max = self.resident_size_max;
@@ -2650,7 +2742,7 @@ cfg_if! {
         }
         impl Eq for log2phys {}
         impl ::fmt::Debug for log2phys {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let l2p_flags = self.l2p_flags;
                 let l2p_contigbytes = self.l2p_contigbytes;
                 let l2p_devoffset = self.l2p_devoffset;
@@ -2680,7 +2772,7 @@ cfg_if! {
         impl Eq for os_unfair_lock {}
 
         impl ::fmt::Debug for os_unfair_lock {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("os_unfair_lock")
                     .field("_os_unfair_lock_opaque", &self._os_unfair_lock_opaque)
                     .finish()
@@ -2706,7 +2798,7 @@ cfg_if! {
         impl Eq for sockaddr_vm {}
 
         impl ::fmt::Debug for sockaddr_vm {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let svm_len = self.svm_len;
                 let svm_family = self.svm_family;
                 let svm_reserved1 = self.svm_reserved1;
@@ -2736,6 +2828,222 @@ cfg_if! {
                 svm_reserved1.hash(state);
                 svm_port.hash(state);
                 svm_cid.hash(state);
+            }
+        }
+
+        impl PartialEq for ifdevmtu {
+            fn eq(&self, other: &ifdevmtu) -> bool {
+                self.ifdm_current == other.ifdm_current
+                    && self.ifdm_min == other.ifdm_min
+                    && self.ifdm_max == other.ifdm_max
+            }
+        }
+
+        impl Eq for ifdevmtu {}
+
+        impl ::fmt::Debug for ifdevmtu {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("ifdevmtu")
+                    .field("ifdm_current", &self.ifdm_current)
+                    .field("ifdm_min", &self.ifdm_min)
+                    .field("ifdm_max", &self.ifdm_max)
+                    .finish()
+            }
+        }
+
+        impl ::hash::Hash for ifdevmtu {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                self.ifdm_current.hash(state);
+                self.ifdm_min.hash(state);
+                self.ifdm_max.hash(state);
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl PartialEq for __c_anonymous_ifk_data {
+            fn eq(&self, other: &__c_anonymous_ifk_data) -> bool {
+                unsafe {
+                    self.ifk_ptr == other.ifk_ptr
+                        && self.ifk_value == other.ifk_value
+                }
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl Eq for __c_anonymous_ifk_data {}
+
+        #[cfg(libc_union)]
+        impl ::fmt::Debug for __c_anonymous_ifk_data {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("__c_anonymous_ifk_data")
+                    .field("ifk_ptr", unsafe { &self.ifk_ptr })
+                    .field("ifk_value", unsafe { &self.ifk_value })
+                    .finish()
+            }
+        }
+        #[cfg(libc_union)]
+        impl ::hash::Hash for __c_anonymous_ifk_data {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                unsafe {
+                    self.ifk_ptr.hash(state);
+                    self.ifk_value.hash(state);
+                }
+            }
+        }
+
+        impl PartialEq for ifkpi {
+            fn eq(&self, other: &ifkpi) -> bool {
+                self.ifk_module_id == other.ifk_module_id
+                    && self.ifk_type == other.ifk_type
+            }
+        }
+
+        impl Eq for ifkpi {}
+
+        impl ::fmt::Debug for ifkpi {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("ifkpi")
+                    .field("ifk_module_id", &self.ifk_module_id)
+                    .field("ifk_type", &self.ifk_type)
+                    .finish()
+            }
+        }
+
+        impl ::hash::Hash for ifkpi {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                self.ifk_module_id.hash(state);
+                self.ifk_type.hash(state);
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl PartialEq for __c_anonymous_ifr_ifru {
+            fn eq(&self, other: &__c_anonymous_ifr_ifru) -> bool {
+                unsafe {
+                    self.ifru_addr == other.ifru_addr
+                        && self.ifru_dstaddr == other.ifru_dstaddr
+                        && self.ifru_broadaddr == other.ifru_broadaddr
+                        && self.ifru_flags == other.ifru_flags
+                        && self.ifru_metrics == other.ifru_metrics
+                        && self.ifru_mtu == other.ifru_mtu
+                        && self.ifru_phys == other.ifru_phys
+                        && self.ifru_media == other.ifru_media
+                        && self.ifru_intval == other.ifru_intval
+                        && self.ifru_data == other.ifru_data
+                        && self.ifru_devmtu == other.ifru_devmtu
+                        && self.ifru_kpi == other.ifru_kpi
+                        && self.ifru_wake_flags == other.ifru_wake_flags
+                        && self.ifru_route_refcnt == other.ifru_route_refcnt
+                        && self.ifru_cap.iter().zip(other.ifru_cap.iter()).all(|(a,b)| a == b)
+                        && self.ifru_functional_type == other.ifru_functional_type
+                }
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl Eq for __c_anonymous_ifr_ifru {}
+
+        #[cfg(libc_union)]
+        impl ::fmt::Debug for __c_anonymous_ifr_ifru {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("__c_anonymous_ifr_ifru")
+                    .field("ifru_addr", unsafe { &self.ifru_addr })
+                    .field("ifru_dstaddr", unsafe { &self.ifru_dstaddr })
+                    .field("ifru_broadaddr", unsafe { &self.ifru_broadaddr })
+                    .field("ifru_flags", unsafe { &self.ifru_flags })
+                    .field("ifru_metrics", unsafe { &self.ifru_metrics })
+                    .field("ifru_mtu", unsafe { &self.ifru_mtu })
+                    .field("ifru_phys", unsafe { &self.ifru_phys })
+                    .field("ifru_media", unsafe { &self.ifru_media })
+                    .field("ifru_intval", unsafe { &self.ifru_intval })
+                    .field("ifru_data", unsafe { &self.ifru_data })
+                    .field("ifru_devmtu", unsafe { &self.ifru_devmtu })
+                    .field("ifru_kpi", unsafe { &self.ifru_kpi })
+                    .field("ifru_wake_flags", unsafe { &self.ifru_wake_flags })
+                    .field("ifru_route_refcnt", unsafe { &self.ifru_route_refcnt })
+                    .field("ifru_cap", unsafe { &self.ifru_cap })
+                    .field("ifru_functional_type", unsafe { &self.ifru_functional_type })
+                    .finish()
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl ::hash::Hash for __c_anonymous_ifr_ifru {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                unsafe {
+                    self.ifru_addr.hash(state);
+                    self.ifru_dstaddr.hash(state);
+                    self.ifru_broadaddr.hash(state);
+                    self.ifru_flags.hash(state);
+                    self.ifru_metrics.hash(state);
+                    self.ifru_mtu.hash(state);
+                    self.ifru_phys.hash(state);
+                    self.ifru_media.hash(state);
+                    self.ifru_intval.hash(state);
+                    self.ifru_data.hash(state);
+                    self.ifru_devmtu.hash(state);
+                    self.ifru_kpi.hash(state);
+                    self.ifru_wake_flags.hash(state);
+                    self.ifru_route_refcnt.hash(state);
+                    self.ifru_cap.hash(state);
+                    self.ifru_functional_type.hash(state);
+                }
+            }
+        }
+
+        impl PartialEq for ifreq {
+            fn eq(&self, other: &ifreq) -> bool {
+                self.ifr_name == other.ifr_name
+                    && self.ifr_ifru == other.ifr_ifru
+            }
+        }
+
+        impl Eq for ifreq {}
+
+        impl ::fmt::Debug for ifreq {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("ifreq")
+                    .field("ifr_name", &self.ifr_name)
+                    .field("ifr_ifru", &self.ifr_ifru)
+                    .finish()
+            }
+        }
+
+        impl ::hash::Hash for ifreq {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                self.ifr_name.hash(state);
+                self.ifr_ifru.hash(state);
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl Eq for __c_anonymous_ifc_ifcu {}
+
+        #[cfg(libc_union)]
+        impl PartialEq for __c_anonymous_ifc_ifcu {
+            fn eq(&self, other: &__c_anonymous_ifc_ifcu) -> bool {
+                unsafe {
+                    self.ifcu_buf == other.ifcu_buf &&
+                    self.ifcu_req == other.ifcu_req
+                }
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl ::fmt::Debug for __c_anonymous_ifc_ifcu {
+            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                f.debug_struct("ifc_ifcu")
+                    .field("ifcu_buf", unsafe { &self.ifcu_buf })
+                    .field("ifcu_req", unsafe { &self.ifcu_req })
+                    .finish()
+            }
+        }
+
+        #[cfg(libc_union)]
+        impl ::hash::Hash for __c_anonymous_ifc_ifcu {
+            fn hash<H: ::hash::Hasher>(&self, state: &mut H) {
+                unsafe { self.ifcu_buf.hash(state) };
+                unsafe { self.ifcu_req.hash(state) };
             }
         }
     }
@@ -3231,6 +3539,9 @@ pub const F_GLOBAL_NOCACHE: ::c_int = 55;
 pub const F_NODIRECT: ::c_int = 62;
 pub const F_LOG2PHYS_EXT: ::c_int = 65;
 pub const F_BARRIERFSYNC: ::c_int = 85;
+pub const F_PUNCHHOLE: ::c_int = 99;
+pub const F_TRIM_ACTIVE_FILE: ::c_int = 100;
+pub const F_SPECULATIVE_READ: ::c_int = 101;
 pub const F_GETPATH_NOFIRMLINK: ::c_int = 102;
 
 pub const F_ALLOCATECONTIG: ::c_uint = 0x02;
@@ -4189,6 +4500,7 @@ pub const RTLD_FIRST: ::c_int = 0x100;
 pub const RTLD_NODELETE: ::c_int = 0x80;
 pub const RTLD_NOLOAD: ::c_int = 0x10;
 pub const RTLD_GLOBAL: ::c_int = 0x8;
+pub const RTLD_MAIN_ONLY: *mut ::c_void = -5isize as *mut ::c_void;
 
 pub const _WSTOPPED: ::c_int = 0o177;
 
@@ -4910,6 +5222,19 @@ pub const COPYFILE_PROGRESS: ::c_int = 4;
 pub const COPYFILE_CONTINUE: ::c_int = 0;
 pub const COPYFILE_SKIP: ::c_int = 1;
 pub const COPYFILE_QUIT: ::c_int = 2;
+pub const COPYFILE_STATE_SRC_FD: ::c_int = 1;
+pub const COPYFILE_STATE_SRC_FILENAME: ::c_int = 2;
+pub const COPYFILE_STATE_DST_FD: ::c_int = 3;
+pub const COPYFILE_STATE_DST_FILENAME: ::c_int = 4;
+pub const COPYFILE_STATE_QUARANTINE: ::c_int = 5;
+pub const COPYFILE_STATE_STATUS_CB: ::c_int = 6;
+pub const COPYFILE_STATE_STATUS_CTX: ::c_int = 7;
+pub const COPYFILE_STATE_COPIED: ::c_int = 8;
+pub const COPYFILE_STATE_XATTRNAME: ::c_int = 9;
+pub const COPYFILE_STATE_WAS_CLONED: ::c_int = 10;
+pub const COPYFILE_STATE_SRC_BSIZE: ::c_int = 11;
+pub const COPYFILE_STATE_DST_BSIZE: ::c_int = 12;
+pub const COPYFILE_STATE_BSIZE: ::c_int = 13;
 
 // <sys/attr.h>
 pub const ATTR_BIT_MAP_COUNT: ::c_ushort = 5;
@@ -5818,6 +6143,10 @@ extern "C" {
         state: copyfile_state_t,
         flags: copyfile_flags_t,
     ) -> ::c_int;
+    pub fn copyfile_state_free(s: copyfile_state_t) -> ::c_int;
+    pub fn copyfile_state_alloc() -> copyfile_state_t;
+    pub fn copyfile_state_get(s: copyfile_state_t, flags: u32, dst: *mut ::c_void) -> ::c_int;
+    pub fn copyfile_state_set(s: copyfile_state_t, flags: u32, src: *const ::c_void) -> ::c_int;
 
     // Added in macOS 10.13
     // ISO/IEC 9899:2011 ("ISO C11") K.3.7.4.1
@@ -6067,6 +6396,11 @@ extern "C" {
         dev: dev_t,
     ) -> ::c_int;
     pub fn freadlink(fd: ::c_int, buf: *mut ::c_char, size: ::size_t) -> ::c_int;
+    pub fn execvP(
+        file: *const ::c_char,
+        search_path: *const ::c_char,
+        argv: *const *mut ::c_char,
+    ) -> ::c_int;
 }
 
 pub unsafe fn mach_task_self() -> ::mach_port_t {
@@ -6081,7 +6415,7 @@ cfg_if! {
     }
 }
 cfg_if! {
-    if #[cfg(any(target_os = "macos", target_os = "ios"))] {
+    if #[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos"))] {
         extern "C" {
             pub fn memmem(
                 haystack: *const ::c_void,

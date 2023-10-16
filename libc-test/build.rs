@@ -299,6 +299,9 @@ fn test_apple(target: &str) {
     }
 
     cfg.skip_struct(move |ty| {
+        if ty.starts_with("__c_anonymous_") {
+            return true;
+        }
         match ty {
             // FIXME: actually a union
             "sigval" => true,
@@ -310,8 +313,13 @@ fn test_apple(target: &str) {
         }
     });
 
-    cfg.skip_type(move |ty| match ty {
-        _ => false,
+    cfg.skip_type(move |ty| {
+        if ty.starts_with("__c_anonymous_") {
+            return true;
+        }
+        match ty {
+            _ => false,
+        }
     });
 
     cfg.skip_const(move |name| {
@@ -364,6 +372,9 @@ fn test_apple(target: &str) {
             ("__darwin_arm_neon_state64", "__v") => true,
             // MAXPATHLEN is too big for auto-derive traits on arrays.
             ("vnode_info_path", "vip_path") => true,
+            ("ifreq", "ifr_ifru") => true,
+            ("ifkpi", "ifk_data") => true,
+            ("ifconf", "ifc_ifcu") => true,
             _ => false,
         }
     });
@@ -512,7 +523,19 @@ fn test_openbsd(target: &str) {
         "sys/param.h",
     }
 
+    cfg.skip_type(move |ty| {
+        if ty.starts_with("__c_anonymous_") {
+            return true;
+        }
+        match ty {
+            _ => false,
+        }
+    });
+
     cfg.skip_struct(move |ty| {
+        if ty.starts_with("__c_anonymous_") {
+            return true;
+        }
         match ty {
             // FIXME: actually a union
             "sigval" => true,
@@ -586,6 +609,8 @@ fn test_openbsd(target: &str) {
             // conflicting with `p_type` macro from <resolve.h>.
             ("Elf32_Phdr", "p_type") => true,
             ("Elf64_Phdr", "p_type") => true,
+            // ifr_ifru is defined is an union
+            ("ifreq", "ifr_ifru") => true,
             _ => false,
         }
     });
@@ -1881,6 +1906,9 @@ fn test_android(target: &str) {
             // Added in API level 28, but some tests use level 24.
             "syncfs" => true,
 
+            // Added in API level 28, but some tests use level 24.
+            "pthread_attr_getinheritsched" | "pthread_attr_setinheritsched" => true,
+
             _ => false,
         }
     });
@@ -2343,6 +2371,9 @@ fn test_freebsd(target: &str) {
             // Added in FreeBSD 13.2
             "AT_USRSTACKBASE" | "AT_USRSTACKLIM" if Some(13) > freebsd_ver => true,
 
+            // Added in FreeBSD 14
+            "TFD_CLOEXEC" | "TFD_NONBLOCK" if Some(14) > freebsd_ver => true,
+
             _ => false,
         }
     });
@@ -2438,6 +2469,11 @@ fn test_freebsd(target: &str) {
             "sched_getaffinity" | "sched_setaffinity" | "sched_getcpu" | "fspacectl"
                 if Some(14) > freebsd_ver =>
             {
+                true
+            }
+
+            // Those are introduced in FreeBSD 14.
+            "timerfd_create" | "timerfd_gettime" | "timerfd_settime" if Some(14) > freebsd_ver => {
                 true
             }
 
@@ -2625,12 +2661,18 @@ fn test_emscripten(target: &str) {
 
             "os_unfair_lock" => "struct os_unfair_lock_s".to_string(),
 
-            t if is_union => format!("union {}", t),
+            // LFS64 types have been removed in Emscripten 3.1.44+
+            // https://github.com/emscripten-core/emscripten/pull/19812
+            "off64_t" => "off_t".to_string(),
 
+            // typedefs don't need any keywords
             t if t.ends_with("_t") => t.to_string(),
 
             // put `struct` in front of all structs:.
             t if is_struct => format!("struct {}", t),
+
+            // put `union` in front of all unions:
+            t if is_union => format!("union {}", t),
 
             t => t.to_string(),
         }
@@ -2658,7 +2700,9 @@ fn test_emscripten(target: &str) {
             // FIXME: The size has been changed due to musl's time64
             "time_t" => true,
 
-            _ => false,
+            // LFS64 types have been removed in Emscripten 3.1.44+
+            // https://github.com/emscripten-core/emscripten/pull/19812
+            t => t.ends_with("64") || t.ends_with("64_t"),
         }
     });
 
@@ -2687,7 +2731,9 @@ fn test_emscripten(target: &str) {
             "utimbuf" | "timeval" | "timespec" | "rusage" | "itimerval" | "sched_param"
             | "stat" | "stat64" | "shmid_ds" | "msqid_ds" => true,
 
-            _ => false,
+            // LFS64 types have been removed in Emscripten 3.1.44+
+            // https://github.com/emscripten-core/emscripten/pull/19812
+            ty => ty.ends_with("64") || ty.ends_with("64_t"),
         }
     });
 
@@ -2728,6 +2774,10 @@ fn test_emscripten(target: &str) {
             | "O_TMPFILE" // to 65
             | "SIG_IGN" // -1
                 => true,
+
+            // LFS64 types have been removed in Emscripten 3.1.44+
+            // https://github.com/emscripten-core/emscripten/pull/19812
+            n if n.starts_with("RLIM64") => true,
 
             _ => false,
         }
@@ -3353,6 +3403,7 @@ fn test_linux(target: &str) {
         "sys/fanotify.h",
         // <sys/auxv.h> is not present on uclibc
         [!uclibc]: "sys/auxv.h",
+        [gnu]: "linux/close_range.h",
     }
 
     // note: aio.h must be included before sys/mount.h
@@ -3790,6 +3841,9 @@ fn test_linux(target: &str) {
             | "MADV_POPULATE_READ"
             | "MADV_POPULATE_WRITE"
             if musl => true,
+
+            // kernel 6.1 minimum
+            "MADV_COLLAPSE" => true,
 
             // FIXME: Requires more recent kernel headers
             | "IFLA_PARENT_DEV_NAME"     // linux v5.13+

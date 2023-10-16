@@ -65,7 +65,7 @@ cfg_if! {
                 }
                 impl Eq for __c_anonymous_uc_sigmask_with_padding {}
                 impl ::fmt::Debug for __c_anonymous_uc_sigmask_with_padding {
-                    fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                         f.debug_struct("uc_sigmask_with_padding")
                             .field("uc_sigmask_with_padding", &self.uc_sigmask)
                             // Ignore padding
@@ -86,7 +86,7 @@ cfg_if! {
                 }
                 impl Eq for __c_anonymous_uc_sigmask {}
                 impl ::fmt::Debug for __c_anonymous_uc_sigmask {
-                    fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                         f.debug_struct("uc_sigmask")
                             .field("uc_sigmask", unsafe { &self.uc_sigmask })
                             .finish()
@@ -111,7 +111,7 @@ cfg_if! {
                 }
                 impl Eq for ucontext_t {}
                 impl ::fmt::Debug for ucontext_t {
-                    fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+                    fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                         f.debug_struct("ucontext_t")
                             .field("uc_flags", &self.uc_flags)
                             .field("uc_link", &self.uc_link)

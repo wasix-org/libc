@@ -230,7 +230,7 @@ cfg_if! {
         impl Eq for fpreg_t {}
 
         impl ::fmt::Debug for fpreg_t {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("fpreg_t")
                     .field("d", &self.d)
                     .finish()
@@ -481,6 +481,7 @@ pub const PTRACE_DETACH: ::c_uint = 17;
 
 pub const MCL_CURRENT: ::c_int = 0x0001;
 pub const MCL_FUTURE: ::c_int = 0x0002;
+pub const MCL_ONFAULT: ::c_int = 0x0004;
 
 pub const EFD_NONBLOCK: ::c_int = 0x800;
 

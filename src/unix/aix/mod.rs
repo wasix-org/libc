@@ -581,7 +581,7 @@ cfg_if! {
         impl Eq for __sigaction_sa_union {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __sigaction_sa_union {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__sigaction_sa_union")
                     .field("__su_handler", unsafe { &self.__su_handler })
                     .field("__su_sigaction", unsafe { &self.__su_sigaction })
@@ -611,7 +611,7 @@ cfg_if! {
         }
         impl Eq for sigaction {}
         impl ::fmt::Debug for sigaction {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("sigaction");
                 #[cfg(libc_union)]
                 struct_formatter.field("sa_union", &self.sa_union);
@@ -643,7 +643,7 @@ cfg_if! {
         impl Eq for __poll_ctl_ext_u {}
         #[cfg(libc_union)]
         impl ::fmt::Debug for __poll_ctl_ext_u {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 f.debug_struct("__poll_ctl_ext_u")
                     .field("addr", unsafe { &self.addr })
                     .field("data32", unsafe { &self.data32 })
@@ -678,7 +678,7 @@ cfg_if! {
         }
         impl Eq for poll_ctl_ext {}
         impl ::fmt::Debug for poll_ctl_ext {
-            fn fmt(&self, f: &mut ::fmt::Formatter) -> ::fmt::Result {
+            fn fmt(&self, f: &mut ::fmt::Formatter<'_>) -> ::fmt::Result {
                 let mut struct_formatter = f.debug_struct("poll_ctl_ext");
                 struct_formatter.field("version", &self.version);
                 struct_formatter.field("command", &self.command);
@@ -1762,6 +1762,7 @@ pub const PRIO_USER: ::c_int = 2;
 pub const RUSAGE_THREAD: ::c_int = 1;
 pub const RLIM_SAVED_MAX: ::c_ulong = RLIM_INFINITY - 1;
 pub const RLIM_SAVED_CUR: ::c_ulong = RLIM_INFINITY - 2;
+#[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
 pub const RLIM_NLIMITS: ::c_int = 10;
 
 // sys/sched.h
@@ -2669,6 +2670,7 @@ extern "C" {
         attr: *const ::pthread_attr_t,
         guardsize: *mut ::size_t,
     ) -> ::c_int;
+    pub fn pthread_attr_setguardsize(attr: *mut ::pthread_attr_t, guardsize: ::size_t) -> ::c_int;
     pub fn pthread_attr_getschedparam(
         attr: *const ::pthread_attr_t,
         param: *mut sched_param,
