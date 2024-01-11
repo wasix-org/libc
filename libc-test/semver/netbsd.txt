@@ -628,6 +628,7 @@ MADV_NORMAL
 MADV_RANDOM
 MADV_SEQUENTIAL
 MADV_WILLNEED
+MAP_ALIGNED
 MAP_ALIGNMENT_16MB
 MAP_ALIGNMENT_1TB
 MAP_ALIGNMENT_256TB
@@ -642,6 +643,7 @@ MAP_NORESERVE
 MAP_REMAPDUP
 MAP_RENAME
 MAP_STACK
+MAP_TRYFIXED
 MAP_WIRED
 MAXFREQ
 MAXPHASE
@@ -670,6 +672,9 @@ MNT_RELATIME
 MNT_SOFTDEP
 MNT_SYMPERM
 MNT_UNION
+MNT_WAIT
+MNT_NOWAIT
+MNT_LAZY
 MOD_CLKA
 MOD_CLKB
 MOD_ESTERROR
@@ -730,6 +735,12 @@ NOTE_DELETE
 NOTE_EXEC
 NOTE_EXIT
 NOTE_EXTEND
+NOTE_FFAND
+NOTE_FFCOPY
+NOTE_FFCTRLMASK
+NOTE_FFLAGSMASK
+NOTE_FFNOP
+NOTE_FFOR
 NOTE_FORK
 NOTE_LINK
 NOTE_LOWAT
@@ -741,6 +752,7 @@ NOTE_RENAME
 NOTE_REVOKE
 NOTE_TRACK
 NOTE_TRACKERR
+NOTE_TRIGGER
 NOTE_USECONDS
 NOTE_WRITE
 NTP_API
@@ -852,6 +864,19 @@ Q_SETQUOTA
 Q_SYNC
 RADIXCHAR
 RAND_MAX
+RB_ASKNAME
+RB_AUTOBOOT
+RB_DUMP
+RB_HALT
+RB_INITNAME
+RB_KDB
+RB_MINIROOT
+RB_NOSYNC
+RB_POWERDOWN
+RB_RDONLY
+RB_SINGLE
+RB_STRING
+RB_USERCONF
 REG_ASSERT
 REG_ATOI
 REG_BACKR
@@ -946,6 +971,7 @@ SOCK_RDM
 SOMAXCONN
 SO_ACCEPTFILTER
 SO_NOHEADER
+SO_NOSIGPIPE
 SO_OVERFLOWED
 SO_REUSEPORT
 SO_TIMESTAMP
@@ -1047,9 +1073,13 @@ VM_PROC_MAP
 VREPRINT
 VSTATUS
 VWERASE
+WALLSIG
+WALTSIG
 WEXITED
 WNOWAIT
+WNOZOMBIE
 WSTOPPED
+WTRAPPED
 YESEXPR
 YESSTR
 _IOFBF
@@ -1176,6 +1206,11 @@ arc4random
 arc4random_buf
 arc4random_uniform
 arphdr
+backtrace
+backtrace_symbols
+backtrace_symbols_fd
+backtrace_symbols_fmt
+backtrace_symbols_fd_fmt
 bsearch
 chflags
 chroot
@@ -1263,6 +1298,7 @@ getitimer
 getlastlogx
 getline
 getloadavg
+getmntinfo
 getnameinfo
 getopt_long
 getpeereid
@@ -1283,6 +1319,7 @@ getutmpx
 getutxent
 getutxid
 getutxline
+getvfsstat
 getxattr
 glob
 glob_t
@@ -1413,6 +1450,7 @@ pseudo_AF_XTP
 pthread_attr_get_np
 pthread_attr_getguardsize
 pthread_attr_getstack
+pthread_attr_setguardsize
 pthread_cancel
 pthread_condattr_setclock
 pthread_getattr_np
@@ -1442,6 +1480,7 @@ readdir_r
 readlinkat
 reallocarr
 reallocarray
+reboot
 recvmmsg
 recvmsg
 regcomp
@@ -1479,6 +1518,7 @@ setgroups
 sethostid
 sethostname
 setitimer
+setlogin
 setpriority
 setproctitle
 setprogname
@@ -1498,6 +1538,7 @@ shmid_ds
 sigaltstack
 sigevent
 siginfo_t
+sigsuspend
 sigtimedwait
 sigwait
 sigwaitinfo
@@ -1511,6 +1552,8 @@ stack_t
 strcasecmp
 strcasestr
 string_to_flags
+strftime
+strftime_l
 strncasecmp
 strndup
 strpct
@@ -1521,6 +1564,7 @@ syscall
 sysctl
 sysctlbyname
 sysctldesc
+tcp_info
 telldir
 timer_create
 timer_delete
@@ -1554,3 +1598,5 @@ EXTATTR_NAMESPACE_EMPTY
 extattr_list_fd
 extattr_list_file
 extattr_list_link
+EOWNERDEAD
+ENOTRECOVERABLE

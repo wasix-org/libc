@@ -39,7 +39,7 @@ test_target() {
         done
     fi
 
-    # Test that libc builds without any default features (no libstd)
+    # Test that libc builds without any default features (no std)
     if [ "${NO_STD}" != "1" ]; then
         cargo "+${RUST}" "${BUILD_CMD}" -vv --no-default-features --target "${TARGET}"
     else
@@ -47,8 +47,8 @@ test_target() {
         RUSTFLAGS="-A improper_ctypes_definitions" cargo "+${RUST}" "${BUILD_CMD}" \
             -Z build-std=core,alloc -vv --no-default-features --target "${TARGET}"
     fi
-    # Test that libc builds with default features (e.g. libstd)
-    # if the target supports libstd
+    # Test that libc builds with default features (e.g. std)
+    # if the target supports std
     if [ "$NO_STD" != "1" ]; then
         cargo "+${RUST}" "${BUILD_CMD}" -vv --target "${TARGET}"
     else
@@ -102,12 +102,6 @@ i686-linux-android \
 i686-unknown-freebsd \
 i686-unknown-linux-gnu \
 i686-unknown-linux-musl \
-mips-unknown-linux-gnu \
-mips-unknown-linux-musl \
-mips64-unknown-linux-gnuabi64 \
-mips64el-unknown-linux-gnuabi64 \
-mipsel-unknown-linux-gnu \
-mipsel-unknown-linux-musl \
 powerpc-unknown-linux-gnu \
 powerpc64-unknown-linux-gnu \
 powerpc64le-unknown-linux-gnu \
@@ -236,9 +230,15 @@ i686-unknown-haiku \
 i686-unknown-netbsd \
 i686-unknown-openbsd \
 i686-wrs-vxworks \
-mipsel-sony-psp \
+mips-unknown-linux-gnu \
+mips-unknown-linux-musl \
+mips64-unknown-linux-gnuabi64 \
 mips64-unknown-linux-muslabi64 \
+mips64el-unknown-linux-gnuabi64 \
 mips64el-unknown-linux-muslabi64 \
+mipsel-unknown-linux-gnu \
+mipsel-unknown-linux-musl \
+mipsel-sony-psp \
 nvptx64-nvidia-cuda \
 powerpc-unknown-linux-gnuspe \
 powerpc-unknown-netbsd \
@@ -251,6 +251,7 @@ riscv32imac-unknown-none-elf \
 riscv32imc-unknown-none-elf \
 riscv32gc-unknown-linux-gnu \
 riscv64gc-unknown-freebsd \
+riscv64gc-unknown-hermit \
 riscv64gc-unknown-linux-musl \
 riscv64gc-unknown-none-elf \
 riscv64imac-unknown-none-elf \
@@ -283,7 +284,6 @@ if [ "${RUST}" = "nightly" ] && [ "${OS}" = "linux" ]; then
 fi
 
 RUST_APPLE_NO_CORE_TARGETS="\
-armv7-apple-ios \
 armv7s-apple-ios \
 i686-apple-darwin \
 i386-apple-ios \

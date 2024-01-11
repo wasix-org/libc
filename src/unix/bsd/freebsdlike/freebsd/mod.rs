@@ -48,6 +48,8 @@ pub type cpusetid_t = ::c_int;
 
 pub type sctp_assoc_t = u32;
 
+pub type eventfd_t = u64;
+
 #[cfg_attr(feature = "extra_traits", derive(Debug, Hash, PartialEq, Eq))]
 #[repr(u32)]
 pub enum devstat_support_flags {
@@ -365,9 +367,13 @@ s! {
     }
 
     pub struct cpuset_t {
-        #[cfg(target_pointer_width = "64")]
+        #[cfg(all(any(freebsd15, freebsd14), target_pointer_width = "64"))]
+        __bits: [::c_long; 16],
+        #[cfg(all(any(freebsd15, freebsd14), target_pointer_width = "32"))]
+        __bits: [::c_long; 32],
+        #[cfg(all(not(any(freebsd15, freebsd14)), target_pointer_width = "64"))]
         __bits: [::c_long; 4],
-        #[cfg(target_pointer_width = "32")]
+        #[cfg(all(not(any(freebsd15, freebsd14)), target_pointer_width = "32"))]
         __bits: [::c_long; 8],
     }
 
@@ -591,9 +597,9 @@ s! {
         pub sa_peer: ::sockaddr_storage,
         pub type_: ::c_int,
         pub dname: [::c_char; 32],
-        #[cfg(any(freebsd12, freebsd13, freebsd14))]
+        #[cfg(any(freebsd12, freebsd13, freebsd14, freebsd15))]
         pub sendq: ::c_uint,
-        #[cfg(any(freebsd12, freebsd13, freebsd14))]
+        #[cfg(any(freebsd12, freebsd13, freebsd14, freebsd15))]
         pub recvq: ::c_uint,
     }
 
@@ -967,6 +973,8 @@ s! {
         pub ifc_len: ::c_int,
         #[cfg(libc_union)]
         pub ifc_ifcu: __c_anonymous_ifc_ifcu,
+        #[cfg(not(libc_union))]
+        pub ifc_ifcu: *mut ifreq,
     }
 
     pub struct au_mask_t {
@@ -994,6 +1002,86 @@ s! {
     pub struct tcp_function_set {
         pub function_set_name: [::c_char; ::TCP_FUNCTION_NAME_LEN_MAX as usize],
         pub pcbcnt: u32,
+    }
+
+    // Note: this structure will change in a backwards-incompatible way in
+    // FreeBSD 15.
+    pub struct tcp_info {
+        pub tcpi_state: u8,
+        pub __tcpi_ca_state: u8,
+        pub __tcpi_retransmits: u8,
+        pub __tcpi_probes: u8,
+        pub __tcpi_backoff: u8,
+        pub tcpi_options: u8,
+        pub tcp_snd_wscale: u8,
+        pub tcp_rcv_wscale: u8,
+        pub tcpi_rto: u32,
+        pub __tcpi_ato: u32,
+        pub tcpi_snd_mss: u32,
+        pub tcpi_rcv_mss: u32,
+        pub __tcpi_unacked: u32,
+        pub __tcpi_sacked: u32,
+        pub __tcpi_lost: u32,
+        pub __tcpi_retrans: u32,
+        pub __tcpi_fackets: u32,
+        pub __tcpi_last_data_sent: u32,
+        pub __tcpi_last_ack_sent: u32,
+        pub tcpi_last_data_recv: u32,
+        pub __tcpi_last_ack_recv: u32,
+        pub __tcpi_pmtu: u32,
+        pub __tcpi_rcv_ssthresh: u32,
+        pub tcpi_rtt: u32,
+        pub tcpi_rttvar: u32,
+        pub tcpi_snd_ssthresh: u32,
+        pub tcpi_snd_cwnd: u32,
+        pub __tcpi_advmss: u32,
+        pub __tcpi_reordering: u32,
+        pub __tcpi_rcv_rtt: u32,
+        pub tcpi_rcv_space: u32,
+        pub tcpi_snd_wnd: u32,
+        pub tcpi_snd_bwnd: u32,
+        pub tcpi_snd_nxt: u32,
+        pub tcpi_rcv_nxt: u32,
+        pub tcpi_toe_tid: u32,
+        pub tcpi_snd_rexmitpack: u32,
+        pub tcpi_rcv_ooopack: u32,
+        pub tcpi_snd_zerowin: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_delivered_ce: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_received_ce: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_delivered_e1_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_delivered_e0_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_delivered_ce_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_received_e1_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_received_e0_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub __tcpi_received_ce_bytes: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_total_tlp: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_total_tlp_bytes: u64,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_snd_una: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_snd_max: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_rcv_numsacks: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_rcv_adv: u32,
+        #[cfg(any(freebsd15, freebsd14))]
+        pub tcpi_dupacks: u32,
+        #[cfg(freebsd14)]
+        pub __tcpi_pad: [u32; 10],
+        #[cfg(freebsd15)]
+        pub __tcpi_pad: [u32; 14],
+        #[cfg(not(any(freebsd15, freebsd14)))]
+        pub __tcpi_pad: [u32; 26],
     }
 
     pub struct _umtx_time {
@@ -1163,6 +1251,100 @@ s! {
         pub ss_total_sndbuf: u32,
         pub ss_total_recv_buf: u32,
     }
+
+    pub struct sctp_assoc_change {
+        pub sac_type: u16,
+        pub sac_flags: u16,
+        pub sac_length: u32,
+        pub sac_state: u16,
+        pub sac_error: u16,
+        pub sac_outbound_streams: u16,
+        pub sac_inbound_streams: u16,
+        pub sac_assoc_id: ::sctp_assoc_t,
+        pub sac_info: [u8; 0],
+    }
+
+    pub struct sctp_paddr_change {
+        pub spc_type: u16,
+        pub spc_flags: u16,
+        pub spc_length: u32,
+        pub spc_aaddr: ::sockaddr_storage,
+        pub spc_state: u32,
+        pub spc_error: u32,
+        pub spc_assoc_id: ::sctp_assoc_t,
+    }
+
+    pub struct sctp_remote_error {
+        pub sre_type: u16,
+        pub sre_flags: u16,
+        pub sre_length: u32,
+        pub sre_error: u16,
+        pub sre_assoc_id: ::sctp_assoc_t,
+        pub sre_data: [u8; 0],
+    }
+
+    pub struct sctp_send_failed_event {
+        pub ssfe_type: u16,
+        pub ssfe_flags: u16,
+        pub ssfe_length: u32,
+        pub ssfe_error: u32,
+        pub ssfe_info: sctp_sndinfo,
+        pub ssfe_assoc_id: ::sctp_assoc_t,
+        pub ssfe_data: [u8; 0],
+    }
+
+    pub struct sctp_shutdown_event {
+        pub sse_type: u16,
+        pub sse_flags: u16,
+        pub sse_length: u32,
+        pub sse_assoc_id: ::sctp_assoc_t,
+    }
+
+    pub struct sctp_adaptation_event {
+        pub sai_type: u16,
+        pub sai_flags: u16,
+        pub sai_length: u32,
+        pub sai_adaptation_ind: u32,
+        pub sai_assoc_id: ::sctp_assoc_t,
+    }
+
+    pub struct sctp_setadaptation {
+        pub ssb_adaptation_ind: u32,
+    }
+
+    pub struct sctp_pdapi_event {
+        pub pdapi_type: u16,
+        pub pdapi_flags: u16,
+        pub pdapi_length: u32,
+        pub pdapi_indication: u32,
+        pub pdapi_stream: u16,
+        pub pdapi_seq: u16,
+        pub pdapi_assoc_id: ::sctp_assoc_t,
+    }
+
+    pub struct sctp_sender_dry_event {
+        pub sender_dry_type: u16,
+        pub sender_dry_flags: u16,
+        pub sender_dry_length: u32,
+        pub sender_dry_assoc_id: ::sctp_assoc_t,
+    }
+
+    pub struct sctp_stream_reset_event {
+        pub strreset_type: u16,
+        pub strreset_flags: u16,
+        pub strreset_length: u32,
+        pub strreset_assoc_id: ::sctp_assoc_t,
+        pub strreset_stream_list: [u16; 0],
+    }
+
+    pub struct sctp_stream_change_event {
+        pub strchange_type: u16,
+        pub strchange_flags: u16,
+        pub strchange_length: u32,
+        pub strchange_assoc_id: ::sctp_assoc_t,
+        pub strchange_instrms: u16,
+        pub strchange_outstrms: u16,
+    }
 }
 
 s_no_extra_traits! {
@@ -1226,9 +1408,9 @@ s_no_extra_traits! {
     }
 
     pub struct ptsstat {
-        #[cfg(any(freebsd12, freebsd13, freebsd14))]
+        #[cfg(any(freebsd12, freebsd13, freebsd14, freebsd15))]
         pub dev: u64,
-        #[cfg(not(any(freebsd12, freebsd13, freebsd14)))]
+        #[cfg(not(any(freebsd12, freebsd13, freebsd14, freebsd15)))]
         pub dev: u32,
         pub devname: [::c_char; SPECNAMELEN as usize + 1],
     }
@@ -2441,7 +2623,13 @@ pub const DEVSTAT_N_TRANS_FLAGS: ::c_int = 4;
 pub const DEVSTAT_NAME_LEN: ::c_int = 16;
 
 // sys/cpuset.h
-pub const CPU_SETSIZE: ::c_int = 256;
+cfg_if! {
+    if #[cfg(any(freebsd15, freebsd14))] {
+        pub const CPU_SETSIZE: ::c_int = 1024;
+    } else {
+        pub const CPU_SETSIZE: ::c_int = 256;
+    }
+}
 
 pub const SIGEV_THREAD_ID: ::c_int = 4;
 
@@ -2461,8 +2649,14 @@ pub const SF_USER_READAHEAD: ::c_int = 0x00000008;
 pub const SF_NOCACHE: ::c_int = 0x00000010;
 pub const O_CLOEXEC: ::c_int = 0x00100000;
 pub const O_DIRECTORY: ::c_int = 0x00020000;
+pub const O_DSYNC: ::c_int = 0x01000000;
+pub const O_EMPTY_PATH: ::c_int = 0x02000000;
 pub const O_EXEC: ::c_int = 0x00040000;
+pub const O_PATH: ::c_int = 0x00400000;
+pub const O_RESOLVE_BENEATH: ::c_int = 0x00800000;
+pub const O_SEARCH: ::c_int = O_EXEC;
 pub const O_TTY_INIT: ::c_int = 0x00080000;
+pub const O_VERIFY: ::c_int = 0x00200000;
 pub const F_GETLK: ::c_int = 11;
 pub const F_SETLK: ::c_int = 12;
 pub const F_SETLKW: ::c_int = 13;
@@ -2502,7 +2696,9 @@ pub const Q_SETQUOTA: ::c_int = 0x800;
 pub const MAP_GUARD: ::c_int = 0x00002000;
 pub const MAP_EXCL: ::c_int = 0x00004000;
 pub const MAP_PREFAULT_READ: ::c_int = 0x00040000;
-pub const MAP_ALIGNED_SUPER: ::c_int = 1 << 24;
+pub const MAP_ALIGNMENT_SHIFT: ::c_int = 24;
+pub const MAP_ALIGNMENT_MASK: ::c_int = 0xff << MAP_ALIGNMENT_SHIFT;
+pub const MAP_ALIGNED_SUPER: ::c_int = 1 << MAP_ALIGNMENT_SHIFT;
 
 pub const POSIX_FADV_NORMAL: ::c_int = 0;
 pub const POSIX_FADV_RANDOM: ::c_int = 1;
@@ -2531,15 +2727,20 @@ pub const EV_ADD: u16 = 0x1;
 pub const EV_DELETE: u16 = 0x2;
 pub const EV_ENABLE: u16 = 0x4;
 pub const EV_DISABLE: u16 = 0x8;
+pub const EV_FORCEONESHOT: u16 = 0x100;
+pub const EV_KEEPUDATA: u16 = 0x200;
+
 pub const EV_ONESHOT: u16 = 0x10;
 pub const EV_CLEAR: u16 = 0x20;
 pub const EV_RECEIPT: u16 = 0x40;
 pub const EV_DISPATCH: u16 = 0x80;
+pub const EV_SYSFLAGS: u16 = 0xf000;
 pub const EV_DROP: u16 = 0x1000;
 pub const EV_FLAG1: u16 = 0x2000;
-pub const EV_ERROR: u16 = 0x4000;
+pub const EV_FLAG2: u16 = 0x4000;
+
 pub const EV_EOF: u16 = 0x8000;
-pub const EV_SYSFLAGS: u16 = 0xf000;
+pub const EV_ERROR: u16 = 0x4000;
 
 pub const NOTE_TRIGGER: u32 = 0x01000000;
 pub const NOTE_FFNOP: u32 = 0x00000000;
@@ -2549,6 +2750,7 @@ pub const NOTE_FFCOPY: u32 = 0xc0000000;
 pub const NOTE_FFCTRLMASK: u32 = 0xc0000000;
 pub const NOTE_FFLAGSMASK: u32 = 0x00ffffff;
 pub const NOTE_LOWAT: u32 = 0x00000001;
+pub const NOTE_FILE_POLL: u32 = 0x00000002;
 pub const NOTE_DELETE: u32 = 0x00000001;
 pub const NOTE_WRITE: u32 = 0x00000002;
 pub const NOTE_EXTEND: u32 = 0x00000004;
@@ -2556,6 +2758,10 @@ pub const NOTE_ATTRIB: u32 = 0x00000008;
 pub const NOTE_LINK: u32 = 0x00000010;
 pub const NOTE_RENAME: u32 = 0x00000020;
 pub const NOTE_REVOKE: u32 = 0x00000040;
+pub const NOTE_OPEN: u32 = 0x00000080;
+pub const NOTE_CLOSE: u32 = 0x00000100;
+pub const NOTE_CLOSE_WRITE: u32 = 0x00000200;
+pub const NOTE_READ: u32 = 0x00000400;
 pub const NOTE_EXIT: u32 = 0x80000000;
 pub const NOTE_FORK: u32 = 0x40000000;
 pub const NOTE_EXEC: u32 = 0x20000000;
@@ -2568,6 +2774,7 @@ pub const NOTE_SECONDS: u32 = 0x00000001;
 pub const NOTE_MSECONDS: u32 = 0x00000002;
 pub const NOTE_USECONDS: u32 = 0x00000004;
 pub const NOTE_NSECONDS: u32 = 0x00000008;
+pub const NOTE_ABSTIME: u32 = 0x00000010;
 
 pub const MADV_PROTECT: ::c_int = 10;
 
@@ -2824,6 +3031,10 @@ pub const MNT_SNAPSHOT: ::c_int = 0x01000000;
 pub const MNT_UNION: ::c_int = 0x00000020;
 pub const MNT_NONBUSY: ::c_int = 0x04000000;
 
+pub const SCM_BINTIME: ::c_int = 0x04;
+pub const SCM_REALTIME: ::c_int = 0x05;
+pub const SCM_MONOTONIC: ::c_int = 0x06;
+pub const SCM_TIME_INFO: ::c_int = 0x07;
 pub const SCM_CREDS2: ::c_int = 0x08;
 
 pub const SO_BINTIME: ::c_int = 0x2000;
@@ -2991,6 +3202,7 @@ pub const IFF_LOOPBACK: ::c_int = 0x8;
 /// (i) is a point-to-point link
 pub const IFF_POINTOPOINT: ::c_int = 0x10;
 /// (i) calls if_input in net epoch
+#[deprecated(since = "0.2.149", note = "Removed in FreeBSD 14")]
 pub const IFF_KNOWSEPOCH: ::c_int = 0x20;
 /// (d) resources allocated
 pub const IFF_RUNNING: ::c_int = 0x40;
@@ -3038,6 +3250,7 @@ pub const IFF_DYING: ::c_int = 0x200000;
 /// (n) interface is being renamed
 pub const IFF_RENAMING: ::c_int = 0x400000;
 /// interface is not part of any groups
+#[deprecated(since = "0.2.149", note = "Removed in FreeBSD 14")]
 pub const IFF_NOGROUP: ::c_int = 0x800000;
 
 /// link invalid/unknown
@@ -3523,6 +3736,7 @@ pub const MSG_NBIO: ::c_int = 0x00004000;
 pub const MSG_COMPAT: ::c_int = 0x00008000;
 pub const MSG_CMSG_CLOEXEC: ::c_int = 0x00040000;
 pub const MSG_NOSIGNAL: ::c_int = 0x20000;
+pub const MSG_WAITFORONE: ::c_int = 0x00080000;
 
 // utmpx entry types
 pub const EMPTY: ::c_short = 0;
@@ -3575,6 +3789,8 @@ pub const AT_EACCESS: ::c_int = 0x100;
 pub const AT_SYMLINK_NOFOLLOW: ::c_int = 0x200;
 pub const AT_SYMLINK_FOLLOW: ::c_int = 0x400;
 pub const AT_REMOVEDIR: ::c_int = 0x800;
+pub const AT_RESOLVE_BENEATH: ::c_int = 0x2000;
+pub const AT_EMPTY_PATH: ::c_int = 0x4000;
 
 pub const AT_NULL: ::c_int = 0;
 pub const AT_IGNORE: ::c_int = 1;
@@ -3592,6 +3808,15 @@ pub const AT_EUID: ::c_int = 12;
 pub const AT_GID: ::c_int = 13;
 pub const AT_EGID: ::c_int = 14;
 pub const AT_EXECPATH: ::c_int = 15;
+pub const AT_CANARY: ::c_int = 16;
+pub const AT_OSRELDATE: ::c_int = 18;
+pub const AT_NCPUS: ::c_int = 19;
+pub const AT_PAGESIZES: ::c_int = 20;
+pub const AT_TIMEKEEP: ::c_int = 22;
+pub const AT_HWCAP: ::c_int = 25;
+pub const AT_HWCAP2: ::c_int = 26;
+pub const AT_USRSTACKBASE: ::c_int = 35;
+pub const AT_USRSTACKLIM: ::c_int = 36;
 
 pub const TABDLY: ::tcflag_t = 0x00000004;
 pub const TAB0: ::tcflag_t = 0x00000000;
@@ -3668,6 +3893,7 @@ pub const RFMEM: ::c_int = 32;
 pub const RFNOWAIT: ::c_int = 64;
 pub const RFCFDG: ::c_int = 4096;
 pub const RFTHREAD: ::c_int = 8192;
+pub const RFSIGSHARE: ::c_int = 16384;
 pub const RFLINUXTHPN: ::c_int = 65536;
 pub const RFTSIGZMB: ::c_int = 524288;
 pub const RFSPAWN: ::c_int = 2147483648;
@@ -4424,6 +4650,109 @@ pub const SCTP_CONTEXT: ::c_int = 0x0000001a;
 pub const SCTP_EXPLICIT_EOR: ::c_int = 0x00000001b;
 pub const SCTP_REUSE_PORT: ::c_int = 0x00000001c;
 pub const SCTP_AUTH_DEACTIVATE_KEY: ::c_int = 0x00000001d;
+pub const SCTP_EVENT: ::c_int = 0x0000001e;
+pub const SCTP_RECVRCVINFO: ::c_int = 0x0000001f;
+pub const SCTP_RECVNXTINFO: ::c_int = 0x00000020;
+pub const SCTP_DEFAULT_SNDINFO: ::c_int = 0x00000021;
+pub const SCTP_DEFAULT_PRINFO: ::c_int = 0x00000022;
+pub const SCTP_PEER_ADDR_THLDS: ::c_int = 0x00000023;
+pub const SCTP_REMOTE_UDP_ENCAPS_PORT: ::c_int = 0x00000024;
+pub const SCTP_ECN_SUPPORTED: ::c_int = 0x00000025;
+pub const SCTP_AUTH_SUPPORTED: ::c_int = 0x00000027;
+pub const SCTP_ASCONF_SUPPORTED: ::c_int = 0x00000028;
+pub const SCTP_RECONFIG_SUPPORTED: ::c_int = 0x00000029;
+pub const SCTP_NRSACK_SUPPORTED: ::c_int = 0x00000030;
+pub const SCTP_PKTDROP_SUPPORTED: ::c_int = 0x00000031;
+pub const SCTP_MAX_CWND: ::c_int = 0x00000032;
+
+pub const SCTP_STATUS: ::c_int = 0x00000100;
+pub const SCTP_GET_PEER_ADDR_INFO: ::c_int = 0x00000101;
+pub const SCTP_PEER_AUTH_CHUNKS: ::c_int = 0x00000102;
+pub const SCTP_LOCAL_AUTH_CHUNKS: ::c_int = 0x00000103;
+pub const SCTP_GET_ASSOC_NUMBER: ::c_int = 0x00000104;
+pub const SCTP_GET_ASSOC_ID_LIST: ::c_int = 0x00000105;
+pub const SCTP_TIMEOUTS: ::c_int = 0x00000106;
+pub const SCTP_PR_STREAM_STATUS: ::c_int = 0x00000107;
+pub const SCTP_PR_ASSOC_STATUS: ::c_int = 0x00000108;
+
+pub const SCTP_COMM_UP: ::c_int = 0x0001;
+pub const SCTP_COMM_LOST: ::c_int = 0x0002;
+pub const SCTP_RESTART: ::c_int = 0x0003;
+pub const SCTP_SHUTDOWN_COMP: ::c_int = 0x0004;
+pub const SCTP_CANT_STR_ASSOC: ::c_int = 0x0005;
+
+pub const SCTP_ASSOC_SUPPORTS_PR: ::c_int = 0x01;
+pub const SCTP_ASSOC_SUPPORTS_AUTH: ::c_int = 0x02;
+pub const SCTP_ASSOC_SUPPORTS_ASCONF: ::c_int = 0x03;
+pub const SCTP_ASSOC_SUPPORTS_MULTIBUF: ::c_int = 0x04;
+pub const SCTP_ASSOC_SUPPORTS_RE_CONFIG: ::c_int = 0x05;
+pub const SCTP_ASSOC_SUPPORTS_INTERLEAVING: ::c_int = 0x06;
+pub const SCTP_ASSOC_SUPPORTS_MAX: ::c_int = 0x06;
+
+pub const SCTP_ADDR_AVAILABLE: ::c_int = 0x0001;
+pub const SCTP_ADDR_UNREACHABLE: ::c_int = 0x0002;
+pub const SCTP_ADDR_REMOVED: ::c_int = 0x0003;
+pub const SCTP_ADDR_ADDED: ::c_int = 0x0004;
+pub const SCTP_ADDR_MADE_PRIM: ::c_int = 0x0005;
+pub const SCTP_ADDR_CONFIRMED: ::c_int = 0x0006;
+
+pub const SCTP_ACTIVE: ::c_int = 0x0001;
+pub const SCTP_INACTIVE: ::c_int = 0x0002;
+pub const SCTP_UNCONFIRMED: ::c_int = 0x0200;
+
+pub const SCTP_DATA_UNSENT: ::c_int = 0x0001;
+pub const SCTP_DATA_SENT: ::c_int = 0x0002;
+
+pub const SCTP_PARTIAL_DELIVERY_ABORTED: ::c_int = 0x0001;
+
+pub const SCTP_AUTH_NEW_KEY: ::c_int = 0x0001;
+pub const SCTP_AUTH_NEWKEY: ::c_int = SCTP_AUTH_NEW_KEY;
+pub const SCTP_AUTH_NO_AUTH: ::c_int = 0x0002;
+pub const SCTP_AUTH_FREE_KEY: ::c_int = 0x0003;
+
+pub const SCTP_STREAM_RESET_INCOMING_SSN: ::c_int = 0x0001;
+pub const SCTP_STREAM_RESET_OUTGOING_SSN: ::c_int = 0x0002;
+pub const SCTP_STREAM_RESET_DENIED: ::c_int = 0x0004;
+pub const SCTP_STREAM_RESET_FAILED: ::c_int = 0x0008;
+
+pub const SCTP_ASSOC_RESET_DENIED: ::c_int = 0x0004;
+pub const SCTP_ASSOC_RESET_FAILED: ::c_int = 0x0008;
+
+pub const SCTP_STREAM_CHANGE_DENIED: ::c_int = 0x0004;
+pub const SCTP_STREAM_CHANGE_FAILED: ::c_int = 0x0008;
+
+pub const KENV_DUMP_LOADER: ::c_int = 4;
+pub const KENV_DUMP_STATIC: ::c_int = 5;
+
+pub const RB_PAUSE: ::c_int = 0x100000;
+pub const RB_REROOT: ::c_int = 0x200000;
+pub const RB_POWERCYCLE: ::c_int = 0x400000;
+pub const RB_PROBE: ::c_int = 0x10000000;
+pub const RB_MULTIPLE: ::c_int = 0x20000000;
+
+// sys/time.h
+pub const CLOCK_BOOTTIME: ::clockid_t = ::CLOCK_UPTIME;
+pub const CLOCK_REALTIME_COARSE: ::clockid_t = ::CLOCK_REALTIME_FAST;
+pub const CLOCK_MONOTONIC_COARSE: ::clockid_t = ::CLOCK_MONOTONIC_FAST;
+
+// sys/timerfd.h
+
+pub const TFD_NONBLOCK: ::c_int = ::O_NONBLOCK;
+pub const TFD_CLOEXEC: ::c_int = O_CLOEXEC;
+pub const TFD_TIMER_ABSTIME: ::c_int = 0x01;
+pub const TFD_TIMER_CANCEL_ON_SET: ::c_int = 0x02;
+
+cfg_if! {
+    if #[cfg(libc_const_extern_fn)] {
+        pub const fn MAP_ALIGNED(a: ::c_int) -> ::c_int {
+            a << 24
+        }
+    } else {
+        pub fn MAP_ALIGNED(a: ::c_int) -> ::c_int {
+            a << 24
+        }
+    }
+}
 
 const_fn! {
     {const} fn _ALIGN(p: usize) -> usize {
@@ -4437,7 +4766,7 @@ f! {
             .offset(_ALIGN(::mem::size_of::<::cmsghdr>()) as isize)
     }
 
-    pub fn CMSG_LEN(length: ::c_uint) -> ::c_uint {
+    pub {const} fn CMSG_LEN(length: ::c_uint) -> ::c_uint {
         _ALIGN(::mem::size_of::<::cmsghdr>()) as ::c_uint + length
     }
 
@@ -4539,6 +4868,14 @@ f! {
             0
         };
         ::mem::size_of::<sockcred2>() + ::mem::size_of::<::gid_t>() * ngrps
+    }
+
+    pub fn PROT_MAX(x: ::c_int) -> ::c_int {
+        x << 16
+    }
+
+    pub fn PROT_MAX_EXTRACT(x: ::c_int) -> ::c_int {
+        (x >> 16) & (::PROT_READ | ::PROT_WRITE | ::PROT_EXEC)
     }
 }
 
@@ -4993,7 +5330,6 @@ extern "C" {
     pub fn fls(value: ::c_int) -> ::c_int;
     pub fn flsl(value: ::c_long) -> ::c_int;
     pub fn flsll(value: ::c_longlong) -> ::c_int;
-    pub fn malloc_usable_size(ptr: *const ::c_void) -> ::size_t;
     pub fn malloc_stats_print(
         write_cb: unsafe extern "C" fn(*mut ::c_void, *const ::c_char),
         cbopaque: *mut ::c_void,
@@ -5034,6 +5370,7 @@ extern "C" {
     pub fn getpagesizes(pagesize: *mut ::size_t, nelem: ::c_int) -> ::c_int;
 
     pub fn clock_getcpuclockid2(arg1: ::id_t, arg2: ::c_int, arg3: *mut clockid_t) -> ::c_int;
+    pub fn strchrnul(s: *const ::c_char, c: ::c_int) -> *mut ::c_char;
 
     pub fn shm_create_largepage(
         path: *const ::c_char,
@@ -5049,6 +5386,19 @@ extern "C" {
     ) -> ::c_int;
     pub fn memfd_create(name: *const ::c_char, flags: ::c_uint) -> ::c_int;
     pub fn setaudit(auditinfo: *const auditinfo_t) -> ::c_int;
+
+    pub fn eventfd(init: ::c_uint, flags: ::c_int) -> ::c_int;
+    pub fn eventfd_read(fd: ::c_int, value: *mut eventfd_t) -> ::c_int;
+    pub fn eventfd_write(fd: ::c_int, value: eventfd_t) -> ::c_int;
+
+    pub fn fdatasync(fd: ::c_int) -> ::c_int;
+
+    pub fn getrandom(buf: *mut ::c_void, buflen: ::size_t, flags: ::c_uint) -> ::ssize_t;
+    pub fn getentropy(buf: *mut ::c_void, buflen: ::size_t) -> ::c_int;
+    pub fn elf_aux_info(aux: ::c_int, buf: *mut ::c_void, buflen: ::c_int) -> ::c_int;
+    pub fn setproctitle_fast(fmt: *const ::c_char, ...);
+    pub fn timingsafe_bcmp(a: *const ::c_void, b: *const ::c_void, len: ::size_t) -> ::c_int;
+    pub fn timingsafe_memcmp(a: *const ::c_void, b: *const ::c_void, len: ::size_t) -> ::c_int;
 
     pub fn _umtx_op(
         obj: *mut ::c_void,
@@ -5086,6 +5436,39 @@ extern "C" {
         arg: *mut ::c_void,
         size: *mut ::socklen_t,
     ) -> ::c_int;
+    pub fn sctp_sendv(
+        sd: ::c_int,
+        iov: *const ::iovec,
+        iovcnt: ::c_int,
+        addrs: *mut ::sockaddr,
+        addrcnt: ::c_int,
+        info: *mut ::c_void,
+        infolen: ::socklen_t,
+        infotype: ::c_uint,
+        flags: ::c_int,
+    ) -> ::ssize_t;
+    pub fn sctp_recvv(
+        sd: ::c_int,
+        iov: *const ::iovec,
+        iovcnt: ::c_int,
+        from: *mut ::sockaddr,
+        fromlen: *mut ::socklen_t,
+        info: *mut ::c_void,
+        infolen: *mut ::socklen_t,
+        infotype: *mut ::c_uint,
+        flags: *mut ::c_int,
+    ) -> ::ssize_t;
+
+    pub fn timerfd_create(clockid: ::c_int, flags: ::c_int) -> ::c_int;
+    pub fn timerfd_gettime(fd: ::c_int, curr_value: *mut itimerspec) -> ::c_int;
+    pub fn timerfd_settime(
+        fd: ::c_int,
+        flags: ::c_int,
+        new_value: *const itimerspec,
+        old_value: *mut itimerspec,
+    ) -> ::c_int;
+    pub fn closefrom(lowfd: ::c_int);
+    pub fn close_range(lowfd: ::c_uint, highfd: ::c_uint, flags: ::c_int) -> ::c_int;
 }
 
 #[link(name = "memstat")]
@@ -5327,7 +5710,10 @@ extern "C" {
 }
 
 cfg_if! {
-    if #[cfg(freebsd14)] {
+    if #[cfg(freebsd15)] {
+        mod freebsd15;
+        pub use self::freebsd15::*;
+    } else if #[cfg(freebsd14)] {
         mod freebsd14;
         pub use self::freebsd14::*;
     } else if #[cfg(freebsd13)] {

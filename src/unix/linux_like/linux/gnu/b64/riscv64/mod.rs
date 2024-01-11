@@ -192,6 +192,41 @@ s! {
         pub l_len: ::off64_t,
         pub l_pid: ::pid_t,
     }
+
+    pub struct user_regs_struct {
+        pub pc: ::c_ulong,
+        pub ra: ::c_ulong,
+        pub sp: ::c_ulong,
+        pub gp: ::c_ulong,
+        pub tp: ::c_ulong,
+        pub t0: ::c_ulong,
+        pub t1: ::c_ulong,
+        pub t2: ::c_ulong,
+        pub s0: ::c_ulong,
+        pub s1: ::c_ulong,
+        pub a0: ::c_ulong,
+        pub a1: ::c_ulong,
+        pub a2: ::c_ulong,
+        pub a3: ::c_ulong,
+        pub a4: ::c_ulong,
+        pub a5: ::c_ulong,
+        pub a6: ::c_ulong,
+        pub a7: ::c_ulong,
+        pub s2: ::c_ulong,
+        pub s3: ::c_ulong,
+        pub s4: ::c_ulong,
+        pub s5: ::c_ulong,
+        pub s6: ::c_ulong,
+        pub s7: ::c_ulong,
+        pub s8: ::c_ulong,
+        pub s9: ::c_ulong,
+        pub s10: ::c_ulong,
+        pub s11: ::c_ulong,
+        pub t3: ::c_ulong,
+        pub t4: ::c_ulong,
+        pub t5: ::c_ulong,
+        pub t6: ::c_ulong,
+    }
 }
 
 pub const POSIX_FADV_DONTNEED: ::c_int = 4;
@@ -397,6 +432,7 @@ pub const PTRACE_GETREGS: ::c_uint = 12;
 pub const PTRACE_SETREGS: ::c_uint = 13;
 pub const MCL_CURRENT: ::c_int = 1;
 pub const MCL_FUTURE: ::c_int = 2;
+pub const MCL_ONFAULT: ::c_int = 4;
 pub const SIGSTKSZ: ::size_t = 8192;
 pub const MINSIGSTKSZ: ::size_t = 2048;
 pub const CBAUD: ::tcflag_t = 4111;

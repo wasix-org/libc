@@ -709,6 +709,7 @@ s_paren! {
     // in wasi-libc clockid_t is const struct __clockid* (where __clockid is an opaque struct),
     // but that's an implementation detail that we don't want to have to deal with
     #[repr(transparent)]
+    #[allow(dead_code)]
     pub struct clockid_t(*const u8);
 }
 
@@ -976,12 +977,15 @@ pub const S_IFREG: mode_t = 32768;
 pub const S_IFLNK: mode_t = 40960;
 pub const S_IFSOCK: mode_t = 49152;
 pub const S_IFMT: mode_t = 57344;
+pub const S_IRWXO: mode_t = 0x7;
 pub const S_IXOTH: mode_t = 0x1;
 pub const S_IWOTH: mode_t = 0x2;
 pub const S_IROTH: mode_t = 0x4;
+pub const S_IRWXG: mode_t = 0x38;
 pub const S_IXGRP: mode_t = 0x8;
 pub const S_IWGRP: mode_t = 0x10;
 pub const S_IRGRP: mode_t = 0x20;
+pub const S_IRWXU: mode_t = 0x1c0;
 pub const S_IXUSR: mode_t = 0x40;
 pub const S_IWUSR: mode_t = 0x80;
 pub const S_IRUSR: mode_t = 0x100;
@@ -1940,3 +1944,5 @@ pub fn W_STOPCODE(sig: ::c_int) -> ::c_int {
 pub fn QCMD(cmd: ::c_int, type_: ::c_int) -> ::c_int {
     (cmd << 8) | (type_ & 0x00ff)
 }
+
+pub fn __errno_location() -> *mut ::c_int;
