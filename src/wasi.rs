@@ -1200,6 +1200,88 @@ pub const WEXITED: ::c_int = 0x00000004;
 pub const WCONTINUED: ::c_int = 0x00000008;
 pub const WNOWAIT: ::c_int = 0x01000000;
 
+
+
+#[cfg(target_vendor = "wasmer")]
+pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
+    sigaction_external_default(sig, sa, old, ::Option::Some(default_handler))
+}
+
+#[cfg(target_vendor = "wasmer")]
+extern "C" fn default_handler(sig: ::c_int) {
+    if sig == SIGCHLD || sig == SIGURG || sig == SIGWINCH || sig == SIGCONT {
+        return;
+    } else {
+        unsafe { abort() };
+    }
+}
+
+#[cfg(target_vendor = "wasmer")]
+mod wasm_signal {
+    #[no_mangle]
+    extern "C" fn __wasm_signal(signum: ::c_int) {
+        unsafe { super::__wasm_signal(signum) };
+    }
+}
+
+/// mocked functions that dont do anything in WASI land
+pub fn mlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
+    0
+}
+pub fn munlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
+    0
+}
+pub fn mlockall(_flags: ::c_int) -> ::c_int {
+    0
+}
+pub fn munlockall() -> ::c_int {
+    0
+}
+
+pub fn WIFSTOPPED(status: ::c_int) -> bool {
+    (status & 0xff) == 0x7f
+}
+
+pub fn WSTOPSIG(status: ::c_int) -> ::c_int {
+    (status >> 8) & 0xff
+}
+
+pub fn WIFCONTINUED(status: ::c_int) -> bool {
+    status == 0xffff
+}
+
+pub fn WIFSIGNALED(status: ::c_int) -> bool {
+    ((status & 0x7f) + 1) as i8 >= 2
+}
+
+pub fn WTERMSIG(status: ::c_int) -> ::c_int {
+    status & 0x7f
+}
+
+pub fn WIFEXITED(status: ::c_int) -> bool {
+    (status & 0x7f) == 0
+}
+
+pub fn WEXITSTATUS(status: ::c_int) -> ::c_int {
+    (status >> 8) & 0xff
+}
+
+pub fn WCOREDUMP(status: ::c_int) -> bool {
+    (status & 0x80) != 0
+}
+
+pub fn W_EXITCODE(ret: ::c_int, sig: ::c_int) -> ::c_int {
+    (ret << 8) | sig
+}
+
+pub fn W_STOPCODE(sig: ::c_int) -> ::c_int {
+    (sig << 8) | 0x7f
+}
+
+pub fn QCMD(cmd: ::c_int, type_: ::c_int) -> ::c_int {
+    (cmd << 8) | (type_ & 0x00ff)
+}
+
 #[cfg_attr(
     feature = "rustc-dep-of-std",
     link(
@@ -1863,86 +1945,6 @@ extern "C" {
     ) -> ::c_int;
     #[cfg(target_vendor = "wasmer")]
     fn __wasm_signal(signum: ::c_int);
-}
 
-#[cfg(target_vendor = "wasmer")]
-pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
-    sigaction_external_default(sig, sa, old, ::Option::Some(default_handler))
+    pub fn __errno_location() -> *mut ::c_int;
 }
-
-#[cfg(target_vendor = "wasmer")]
-extern "C" fn default_handler(sig: ::c_int) {
-    if sig == SIGCHLD || sig == SIGURG || sig == SIGWINCH || sig == SIGCONT {
-        return;
-    } else {
-        unsafe { abort() };
-    }
-}
-
-#[cfg(target_vendor = "wasmer")]
-mod wasm_signal {
-    #[no_mangle]
-    extern "C" fn __wasm_signal(signum: ::c_int) {
-        unsafe { super::__wasm_signal(signum) };
-    }
-}
-
-/// mocked functions that dont do anything in WASI land
-pub fn mlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
-    0
-}
-pub fn munlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
-    0
-}
-pub fn mlockall(_flags: ::c_int) -> ::c_int {
-    0
-}
-pub fn munlockall() -> ::c_int {
-    0
-}
-
-pub fn WIFSTOPPED(status: ::c_int) -> bool {
-    (status & 0xff) == 0x7f
-}
-
-pub fn WSTOPSIG(status: ::c_int) -> ::c_int {
-    (status >> 8) & 0xff
-}
-
-pub fn WIFCONTINUED(status: ::c_int) -> bool {
-    status == 0xffff
-}
-
-pub fn WIFSIGNALED(status: ::c_int) -> bool {
-    ((status & 0x7f) + 1) as i8 >= 2
-}
-
-pub fn WTERMSIG(status: ::c_int) -> ::c_int {
-    status & 0x7f
-}
-
-pub fn WIFEXITED(status: ::c_int) -> bool {
-    (status & 0x7f) == 0
-}
-
-pub fn WEXITSTATUS(status: ::c_int) -> ::c_int {
-    (status >> 8) & 0xff
-}
-
-pub fn WCOREDUMP(status: ::c_int) -> bool {
-    (status & 0x80) != 0
-}
-
-pub fn W_EXITCODE(ret: ::c_int, sig: ::c_int) -> ::c_int {
-    (ret << 8) | sig
-}
-
-pub fn W_STOPCODE(sig: ::c_int) -> ::c_int {
-    (sig << 8) | 0x7f
-}
-
-pub fn QCMD(cmd: ::c_int, type_: ::c_int) -> ::c_int {
-    (cmd << 8) | (type_ & 0x00ff)
-}
-
-pub fn __errno_location() -> *mut ::c_int;
