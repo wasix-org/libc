@@ -1219,8 +1219,8 @@ extern "C" fn default_handler(sig: ::c_int) {
 #[cfg(target_vendor = "wasmer")]
 mod wasm_signal {
     #[no_mangle]
-    extern "C" fn __wasm_signal_polyfill(signum: ::c_int) {
-        unsafe { super::__wasm_signal2(signum) };
+    extern "C" fn __polyfill_for_wasm_signal(signum: ::c_int) {
+        unsafe { super::__wasm_signal(signum) };
     }
 }
 
@@ -1944,7 +1944,7 @@ extern "C" {
         _external_handler: ::Option<unsafe extern "C" fn(::c_int)>,
     ) -> ::c_int;
     #[cfg(target_vendor = "wasmer")]
-    fn __wasm_signal2(signum: ::c_int);
+    fn __wasm_signal(signum: ::c_int);
 
     pub fn __errno_location() -> *mut ::c_int;
 }
