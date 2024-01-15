@@ -1219,7 +1219,7 @@ extern "C" fn default_handler(sig: ::c_int) {
 #[cfg(target_vendor = "wasmer")]
 mod wasm_signal {
     #[no_mangle]
-    extern "C" fn __wasm_signal(signum: ::c_int) {
+    extern "C" fn __wasm_signal_polyfill(signum: ::c_int) {
         unsafe { super::__wasm_signal(signum) };
     }
 }
