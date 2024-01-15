@@ -1216,7 +1216,6 @@ extern "C" fn default_handler(sig: ::c_int) {
     }
 }
 
-/*
 #[cfg(target_vendor = "wasmer")]
 mod wasm_signal {
     #[no_mangle]
@@ -1224,7 +1223,6 @@ mod wasm_signal {
         unsafe { super::__wasm_signal(signum) };
     }
 }
-*/
 
 /// mocked functions that dont do anything in WASI land
 pub fn mlock(_addr: *const ::c_void, _len: ::size_t) -> ::c_int {
