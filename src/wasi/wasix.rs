@@ -960,7 +960,7 @@ extern "C" {
         old: *mut sigaction,
         _external_handler: ::Option<unsafe extern "C" fn(::c_int)>,
     ) -> ::c_int;
-    fn __wasm_signal(signum: ::c_int);
+    fn __wasm_signal_impl(signum: ::c_int);
 }
 
 pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
@@ -975,11 +975,11 @@ extern "C" fn default_handler(sig: ::c_int) {
     }
 }
 
-mod wasm_signal {
-    #[no_mangle]
-    extern "C" fn __wasm_signal(signum: ::c_int) {
-        unsafe { super::__wasm_signal(signum) };
-    }
+// Export the __wasm_signal function, used for receiving
+// signals from a WASIX runtime by wasix-libc
+#[no_mangle]
+extern "C" fn __wasm_signal(signum: ::c_int) {
+    unsafe { __wasm_signal_impl(signum) };
 }
 
 /// mocked functions that dont do anything in WASI land
