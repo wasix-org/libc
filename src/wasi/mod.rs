@@ -887,11 +887,14 @@ cfg_if! {
         mod p2;
         pub use self::p2::*;
     }
+}
 
+cfg_if! {
     if #[cfg(target_vendor = "wasmer")] {
         mod wasix;
         pub use self::wasix::*;
     } else {
-        pub type sigset_t = c_uchar;
+        mod wasi;
+        pub use self::wasi::*;
     }
 }
