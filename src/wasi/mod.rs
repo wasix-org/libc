@@ -1,6 +1,8 @@
 // [wasi-libc](https://github.com/WebAssembly/wasi-libc) definitions.
 // `wasi-libc` project provides multiple libraries including emulated features, but we list only basic features with `libc.a` here.
 
+#![allow(unexpected_cfgs)]
+
 use super::{Send, Sync};
 use core::iter::Iterator;
 
@@ -31,7 +33,6 @@ pub type time_t = c_longlong;
 pub type c_double = f64;
 pub type c_float = f32;
 pub type ino_t = u64;
-pub type sigset_t = c_uchar;
 pub type suseconds_t = c_longlong;
 pub type mode_t = u32;
 pub type dev_t = u64;
@@ -887,5 +888,15 @@ cfg_if! {
     if #[cfg(target_env = "p2")] {
         mod p2;
         pub use self::p2::*;
+    }
+}
+
+cfg_if! {
+    if #[cfg(target_vendor = "wasmer")] {
+        mod wasix;
+        pub use self::wasix::*;
+    } else {
+        mod wasi;
+        pub use self::wasi::*;
     }
 }
