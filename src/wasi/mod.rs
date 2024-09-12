@@ -889,6 +889,7 @@ cfg_if! {
     }
 }
 
+#[allow(unexpected_cfgs)]
 cfg_if! {
     if #[cfg(target_vendor = "wasmer")] {
         mod wasix;
