@@ -1,6 +1,11 @@
 pub type sa_family_t = ::c_ushort;
 pub type in_port_t = ::c_ushort;
 pub type in_addr_t = ::c_uint;
+pub type sa_family_t = u16;
+pub type sa_type_t = u16;
+pub type pthread_t = ::c_ulong;
+pub type pthread_key_t = ::c_uint;
+pub type sighandler_t = ::size_t;
 
 pub type socklen_t = ::c_uint;
 
