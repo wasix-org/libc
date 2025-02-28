@@ -1,13 +1,19 @@
 pub type sighandler_t = ::size_t;
 pub type pthread_t = ::c_ulong;
 pub type pthread_key_t = ::c_uint;
-pub type socklen_t = u32;
-pub type in_addr_t = u32;
-pub type in_port_t = u16;
-pub type sa_family_t = u16;
+pub type sa_family_t = ::c_ushort;
+pub type in_port_t = ::c_ushort;
+pub type in_addr_t = ::c_uint;
+pub type socklen_t = ::c_uint;
 pub type sa_type_t = u16;
 
 s! {
+    #[repr(C)]
+    pub struct fd_set {
+        __nfds: usize,
+        __fds: [::c_int; ::FD_SETSIZE as usize],
+    }
+
     #[repr(C)]
     pub struct in_addr {
         pub s_addr: ::in_addr_t,
