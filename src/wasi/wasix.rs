@@ -6,6 +6,9 @@ pub type in_addr_t = u32;
 pub type in_port_t = u16;
 pub type sa_family_t = u16;
 pub type sa_type_t = u16;
+pub type cc_t = ::c_uint;
+pub type speed_t = ::c_ulong;
+pub type tcflag_t = ::c_uint;
 
 s! {
     #[repr(C)]
@@ -262,6 +265,22 @@ s! {
         __prio: ::c_int,
         __policy: ::c_int,
         __pad: [::c_int; 16],
+    }
+
+    pub struct fd_set {
+        __nfds: usize,
+        __fds: [c_int; FD_SETSIZE as usize],
+    }
+
+    pub struct termios {
+        pub c_iflag: ::tcflag_t,
+        pub c_oflag: ::tcflag_t,
+        pub c_cflag: ::tcflag_t,
+        pub c_lflag: ::tcflag_t,
+        pub c_line: ::cc_t,
+        pub c_cc: [::cc_t; ::NCCS],
+        pub c_ispeed: ::speed_t,
+        pub c_ospeed: ::speed_t,
     }
 }
 
@@ -739,6 +758,13 @@ pub const SA_NODEFER: ::c_int = 0x40000000;
 pub const SA_RESETHAND: ::c_int = 0x80000000;
 pub const SA_RESTORER: ::c_int = 0x04000000;
 
+pub const ECHO: ::tcflag_t = 0x00000008;
+pub const ICANON: ::tcflag_t = 0x00000002;
+pub const TCSANOW: ::c_int = 0;
+pub const NCCS: usize = 32;
+pub const VTIME: usize = 5;
+pub const VMIN: usize = 6;
+
 #[cfg_attr(
     feature = "rustc-dep-of-std",
     link(
@@ -930,6 +956,9 @@ extern "C" {
 
     pub fn sigprocmask(how: ::c_int, set: *const sigset_t, oldset: *mut sigset_t) -> ::c_int;
     pub fn sigpending(set: *mut sigset_t) -> ::c_int;
+
+    pub fn tcgetattr(fd: ::c_int, termios: *mut ::termios) -> ::c_int;
+    pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const ::termios) -> ::c_int;
 
     pub fn pthread_self() -> ::pthread_t;
     pub fn pthread_join(native: ::pthread_t, value: *mut *mut ::c_void) -> ::c_int;
