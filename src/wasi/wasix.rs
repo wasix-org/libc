@@ -6,8 +6,8 @@ pub type in_addr_t = u32;
 pub type in_port_t = u16;
 pub type sa_family_t = u16;
 pub type sa_type_t = u16;
-pub type cc_t = ::c_uint;
-pub type speed_t = ::c_ulong;
+pub type cc_t = ::c_uchar;
+pub type speed_t = ::c_uint;
 pub type tcflag_t = ::c_uint;
 
 s! {
