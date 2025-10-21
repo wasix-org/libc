@@ -1,4 +1,5 @@
 //! x86_64-specific definitions for 64-bit linux-like values
+#![allow(unpredictable_function_pointer_comparisons)]
 
 pub type c_char = i8;
 pub type wchar_t = i32;

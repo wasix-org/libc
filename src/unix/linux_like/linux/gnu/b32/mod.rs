@@ -1,4 +1,5 @@
 //! 32-bit specific definitions for linux-like values
+#![allow(unpredictable_function_pointer_comparisons)]
 
 use pthread_mutex_t;
 
