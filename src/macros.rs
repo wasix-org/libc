@@ -191,7 +191,7 @@ cfg_if! {
             })*) => ($(
                 #[inline]
                 $(#[$attr])*
-                pub $($constness)* unsafe extern fn $i($($arg: $argty),*
+                pub $($constness)* unsafe extern "C" fn $i($($arg: $argty),*
                 ) -> $ret {
                     $($body);*
                 }
@@ -206,7 +206,7 @@ cfg_if! {
             })*) => ($(
                 #[inline]
                 $(#[$attr])*
-                pub $($constness)* extern fn $i($($arg: $argty),*
+                pub $($constness)* extern "C" fn $i($($arg: $argty),*
                 ) -> $ret {
                     $($body);*
                 }
@@ -237,7 +237,7 @@ cfg_if! {
             })*) => ($(
                 #[inline]
                 $(#[$attr])*
-                pub unsafe extern fn $i($($arg: $argty),*
+                pub unsafe extern "C" fn $i($($arg: $argty),*
                 ) -> $ret {
                     $($body);*
                 }
@@ -252,7 +252,7 @@ cfg_if! {
             })*) => ($(
                 #[inline]
                 $(#[$attr])*
-                pub extern fn $i($($arg: $argty),*
+                pub extern "C" fn $i($($arg: $argty),*
                 ) -> $ret {
                     $($body);*
                 }

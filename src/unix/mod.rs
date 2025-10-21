@@ -346,17 +346,17 @@ cfg_if! {
         #[link(name = "m", cfg(not(target_feature = "crt-static")))]
         #[link(name = "dl", cfg(not(target_feature = "crt-static")))]
         #[link(name = "c", cfg(not(target_feature = "crt-static")))]
-        extern {}
+        extern "C" {}
     } else if #[cfg(any(target_env = "musl", target_env = "ohos"))] {
         #[cfg_attr(feature = "rustc-dep-of-std",
                    link(name = "c", kind = "static", modifiers = "-bundle",
                         cfg(target_feature = "crt-static")))]
         #[cfg_attr(feature = "rustc-dep-of-std",
                    link(name = "c", cfg(not(target_feature = "crt-static"))))]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_os = "emscripten")] {
         #[link(name = "c")]
-        extern {}
+        extern "C" {}
     } else if #[cfg(all(target_os = "android", feature = "rustc-dep-of-std"))] {
         #[link(name = "c", kind = "static", modifiers = "-bundle",
             cfg(target_feature = "crt-static"))]
@@ -364,7 +364,7 @@ cfg_if! {
             cfg(target_feature = "crt-static"))]
         #[link(name = "m", cfg(not(target_feature = "crt-static")))]
         #[link(name = "c", cfg(not(target_feature = "crt-static")))]
-        extern {}
+        extern "C" {}
     } else if #[cfg(any(target_os = "macos",
                         target_os = "ios",
                         target_os = "tvos",
@@ -376,38 +376,38 @@ cfg_if! {
                     ))] {
         #[link(name = "c")]
         #[link(name = "m")]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_os = "haiku")] {
         #[link(name = "root")]
         #[link(name = "network")]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_env = "newlib")] {
         #[link(name = "c")]
         #[link(name = "m")]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_env = "illumos")] {
         #[link(name = "c")]
         #[link(name = "m")]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_os = "redox")] {
         #[cfg_attr(feature = "rustc-dep-of-std",
                    link(name = "c", kind = "static", modifiers = "-bundle",
                         cfg(target_feature = "crt-static")))]
         #[cfg_attr(feature = "rustc-dep-of-std",
                    link(name = "c", cfg(not(target_feature = "crt-static"))))]
-        extern {}
+        extern "C" {}
     } else if #[cfg(target_os = "aix")] {
         #[link(name = "c")]
         #[link(name = "m")]
         #[link(name = "bsd")]
         #[link(name = "pthread")]
-        extern {}
+        extern "C" {}
     } else {
         #[link(name = "c")]
         #[link(name = "m")]
         #[link(name = "rt")]
         #[link(name = "pthread")]
-        extern {}
+        extern "C" {}
     }
 }
 
@@ -1444,7 +1444,7 @@ cfg_if! {
 
 cfg_if! {
     if #[cfg(not(target_os = "redox"))] {
-        extern {
+        extern "C" {
             pub fn getsid(pid: pid_t) -> pid_t;
             #[cfg_attr(all(target_os = "macos", target_arch = "x86"),
                        link_name = "pause$UNIX2003")]
@@ -1483,7 +1483,7 @@ cfg_if! {
 
 cfg_if! {
     if #[cfg(target_os = "nto")] {
-        extern {
+        extern "C" {
             pub fn readlinkat(dirfd: ::c_int,
                 pathname: *const ::c_char,
                 buf: *mut ::c_char,
@@ -1504,7 +1504,7 @@ cfg_if! {
             ) -> ::c_int;
         }
     } else {
-        extern {
+        extern "C" {
             pub fn readlinkat(dirfd: ::c_int,
                 pathname: *const ::c_char,
                 buf: *mut ::c_char,
@@ -1545,7 +1545,7 @@ cfg_if! {
                     target_os = "illumos",
                     target_os = "nto",
                 )))] {
-        extern {
+        extern "C" {
             pub fn cfmakeraw(termios: *mut ::termios);
             pub fn cfsetspeed(termios: *mut ::termios,
                               speed: ::speed_t) -> ::c_int;
