@@ -3227,7 +3227,7 @@ fn test_neutrino(target: &str) {
         false // keep me for smaller diffs when something is added above
     });
 
-    cfg.skip_static(move |name| (name == "__dso_handle"));
+    cfg.skip_static(move |name| name == "__dso_handle");
 
     cfg.generate("../src/lib.rs", "main.rs");
 }
