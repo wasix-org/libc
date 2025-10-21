@@ -1,3 +1,5 @@
+#![allow(unpredictable_function_pointer_comparisons)]
+
 pub type boolean_t = ::c_uint;
 pub type mcontext_t = *mut __darwin_mcontext64;
 
