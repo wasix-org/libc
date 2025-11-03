@@ -1098,11 +1098,7 @@ pub const _SC_NPROCESSORS_ONLN: ::c_int = 84;
 pub const _SC_SYMLOOP_MAX: c_int = 173;
 
 pub static CLOCK_MONOTONIC: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC)) };
-pub static CLOCK_PROCESS_CPUTIME_ID: clockid_t =
-    unsafe { clockid_t(ptr_addr_of!(_CLOCK_PROCESS_CPUTIME_ID)) };
 pub static CLOCK_REALTIME: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_REALTIME)) };
-pub static CLOCK_THREAD_CPUTIME_ID: clockid_t =
-    unsafe { clockid_t(ptr_addr_of!(_CLOCK_THREAD_CPUTIME_ID)) };
 
 pub const ABDAY_1: ::nl_item = 0x20000;
 pub const ABDAY_2: ::nl_item = 0x20001;
@@ -1199,8 +1195,6 @@ pub const WSTOPPED: ::c_int = WUNTRACED;
 pub const WEXITED: ::c_int = 0x00000004;
 pub const WCONTINUED: ::c_int = 0x00000008;
 pub const WNOWAIT: ::c_int = 0x01000000;
-
-
 
 #[cfg(target_vendor = "wasmer")]
 pub unsafe fn sigaction(sig: ::c_int, sa: *const sigaction, old: *mut sigaction) -> ::c_int {
