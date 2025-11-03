@@ -269,7 +269,7 @@ s! {
 
     pub struct fd_set {
         __nfds: usize,
-        __fds: [c_int; FD_SETSIZE as usize],
+        __fds: [::c_int; ::FD_SETSIZE as usize],
     }
 
     pub struct termios {
