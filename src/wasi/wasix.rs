@@ -234,7 +234,7 @@ s! {
         pub sa_sigaction: ::sighandler_t,
         pub sa_mask: ::sigset_t,
         pub sa_flags: ::c_int,
-        pub sa_restorer: ::Option<extern fn()>,
+        pub sa_restorer: ::Option<extern "C" fn()>,
     }
 
     pub struct linger {
@@ -959,6 +959,8 @@ extern "C" {
 
     pub fn tcgetattr(fd: ::c_int, termios: *mut ::termios) -> ::c_int;
     pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const ::termios) -> ::c_int;
+
+    pub fn realpath(pathname: *const ::c_char, resolved: *mut ::c_char) -> *mut ::c_char;
 
     pub fn pthread_self() -> ::pthread_t;
     pub fn pthread_join(native: ::pthread_t, value: *mut *mut ::c_void) -> ::c_int;

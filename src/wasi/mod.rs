@@ -377,8 +377,8 @@ pub const _SC_IOV_MAX: c_int = 60;
 pub const _SC_NPROCESSORS_ONLN: ::c_int = 84;
 pub const _SC_SYMLOOP_MAX: c_int = 173;
 
-pub static CLOCK_MONOTONIC: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC)) };
-pub static CLOCK_REALTIME: clockid_t = unsafe { clockid_t(ptr_addr_of!(_CLOCK_REALTIME)) };
+pub static CLOCK_MONOTONIC: clockid_t = clockid_t(ptr_addr_of!(_CLOCK_MONOTONIC));
+pub static CLOCK_REALTIME: clockid_t = clockid_t(ptr_addr_of!(_CLOCK_REALTIME));
 
 pub const ABDAY_1: ::nl_item = 0x20000;
 pub const ABDAY_2: ::nl_item = 0x20001;
