@@ -700,6 +700,8 @@ pub const POSIX_SPAWN_SETSIGDEF: ::c_int = 0x04;
 pub const POSIX_SPAWN_SETSIGMASK: ::c_int = 0x08;
 pub const POSIX_SPAWN_SETSCHEDPARAM: ::c_int = 0x10;
 pub const POSIX_SPAWN_SETSCHEDULER: ::c_int = 0x20;
+pub const POSIX_SPAWN_USEVFORK: ::c_int = 0x40;
+pub const POSIX_SPAWN_SETSID: ::c_int = 0x80;
 
 pub const WNOHANG: ::c_int = 0x00000001;
 pub const WUNTRACED: ::c_int = 0x00000002;
@@ -843,6 +845,7 @@ extern "C" {
     ) -> ::c_int;
 
     pub fn __wasilibc_initialize_environ();
+    pub fn __wasilibc_get_environ() -> *mut *mut ::c_char;
     pub fn __wasilibc_get_stack_pointer() -> *mut ::c_void;
     pub fn __wasilibc_set_stack_pointer(val: *mut ::c_void);
     pub fn __wasilibc_get_pthread_self() -> *mut ::c_void;
@@ -942,6 +945,14 @@ extern "C" {
         actions: *mut posix_spawn_file_actions_t,
         fd: ::c_int,
         newfd: ::c_int,
+    ) -> ::c_int;
+    pub fn posix_spawn_file_actions_addchdir_np(
+        actions: *mut posix_spawn_file_actions_t,
+        path: *const ::c_char,
+    ) -> ::c_int;
+    pub fn posix_spawn_file_actions_addfchdir_np(
+        actions: *mut posix_spawn_file_actions_t,
+        fd: ::c_int,
     ) -> ::c_int;
 
     pub fn wait(status: *mut ::c_int) -> ::pid_t;
