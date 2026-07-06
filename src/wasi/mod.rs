@@ -19,7 +19,6 @@ pub type pid_t = i32;
 pub type clock_t = c_longlong;
 pub type time_t = c_longlong;
 pub type ino_t = u64;
-pub type sigset_t = c_uchar;
 pub type suseconds_t = c_longlong;
 pub type mode_t = u32;
 pub type dev_t = u64;
@@ -54,17 +53,6 @@ pub enum DIR {}
 #[allow(missing_copy_implementations)]
 #[derive(Debug)]
 pub enum __locale_struct {}
-
-s_paren! {
-    // in wasi-libc clockid_t is const struct __clockid* (where __clockid is an opaque struct),
-    // but that's an implementation detail that we don't want to have to deal with
-    #[repr(transparent)]
-    #[allow(dead_code)]
-    pub struct clockid_t(*const u8);
-}
-
-unsafe impl Send for clockid_t {}
-unsafe impl Sync for clockid_t {}
 
 s! {
     #[repr(align(8))]
@@ -405,12 +393,6 @@ pub const _SC_PAGE_SIZE: c_int = _SC_PAGESIZE;
 pub const _SC_IOV_MAX: c_int = 60;
 pub const _SC_SYMLOOP_MAX: c_int = 173;
 
-// FIXME(msrv): `addr_of!(EXTERN_STATIC)` is now safe; remove `unsafe` when MSRV >= 1.82
-#[allow(unused_unsafe)]
-pub static CLOCK_MONOTONIC: clockid_t = unsafe { clockid_t(core::ptr::addr_of!(_CLOCK_MONOTONIC)) };
-#[allow(unused_unsafe)]
-pub static CLOCK_REALTIME: clockid_t = unsafe { clockid_t(core::ptr::addr_of!(_CLOCK_REALTIME)) };
-
 pub const ABDAY_1: crate::nl_item = 0x20000;
 pub const ABDAY_2: crate::nl_item = 0x20001;
 pub const ABDAY_3: crate::nl_item = 0x20002;
@@ -580,9 +562,6 @@ extern "C" {
     pub fn localtime_r(a: *const time_t, b: *mut tm) -> *mut tm;
     pub fn asctime_r(a: *const tm, b: *mut c_char) -> *mut c_char;
     pub fn ctime_r(a: *const time_t, b: *mut c_char) -> *mut c_char;
-
-    static _CLOCK_MONOTONIC: u8;
-    static _CLOCK_REALTIME: u8;
     pub fn nanosleep(a: *const timespec, b: *mut timespec) -> c_int;
     pub fn clock_getres(a: clockid_t, b: *mut timespec) -> c_int;
     pub fn clock_gettime(a: clockid_t, b: *mut timespec) -> c_int;
@@ -952,8 +931,20 @@ extern "C" {
 }
 
 cfg_if! {
-    if #[cfg(not(target_env = "p1"))] {
-        mod p2;
-        pub use self::p2::*;
+    if #[cfg(target_vendor = "wasmer")] {
+        // WASIX: wasi-libc fork with threads, sockets, process management etc.
+        // (https://github.com/wasix-org/wasix-libc)
+        mod wasix;
+        pub use self::wasix::*;
+    } else {
+        mod wasi;
+        pub use self::wasi::*;
+
+        cfg_if! {
+            if #[cfg(not(target_env = "p1"))] {
+                mod p2;
+                pub use self::p2::*;
+            }
+        }
     }
 }
