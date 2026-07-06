@@ -53,6 +53,9 @@ const CHECK_CFG_EXTRA: &[(&str, &[&str])] = &[
         "target_arch",
         &["loongarch64", "mips32r6", "mips64r6", "csky"],
     ),
+    // The *-wasmer-wasi (WASIX) targets exist only in the wasix-org toolchain.
+    ("target_vendor", &["wasmer"]),
+    ("target_env", &["dl"]),
 ];
 
 /// Musl architectures that define `_REDIR_TIME64` (i.e. those that transitioned
